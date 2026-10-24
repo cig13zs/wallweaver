@@ -1,0 +1,23 @@
+[package]
+name = "ww-manifest"
+description = "wallpaper.json (schema v1) types and validation for Wallweaver packages"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json = { workspace = true, features = ["preserve_order"] }
+thiserror.workspace = true
+indexmap = { version = "2", features = ["serde"] }
+schemars = { version = "1", features = ["indexmap2", "semver1"] }
+semver = { version = "1", features = ["serde"] }
+serde_path_to_error = "0.1"
+spdx = "0.13"
+url = "2"
+
+[lints]
+workspace = true

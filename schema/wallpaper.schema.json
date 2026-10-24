@@ -1,0 +1,372 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional link to this schema, for editor completion. Ignored by Wallweaver."
+    },
+    "manifestVersion": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 1,
+      "description": "Manifest format version. Must be 1.",
+      "maximum": 1
+    },
+    "id": {
+      "type": "string",
+      "description": "Package id: lowercase letters, digits, dots and dashes, 3 to 64 characters.\nA `creator.name` style id is recommended, for example `mira.aurora-loom`.",
+      "minLength": 3,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+([.-][a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name shown in the gallery and library.",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the package, for example `1.2.0`."
+    },
+    "type": {
+      "$ref": "#/$defs/WallpaperType",
+      "description": "What kind of package this is."
+    },
+    "entry": {
+      "type": "string",
+      "description": "Path of the file Wallweaver loads first, relative to the package root.",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "author": {
+      "$ref": "#/$defs/Author",
+      "description": "Who made the package."
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license expression, for example `MIT` or `CC-BY-4.0`.\nUse `LicenseRef-<name>` for a custom license.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "One or two sentences describing the wallpaper.",
+      "maxLength": 500
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Up to 10 lowercase tags such as `space` or `audio-reactive`.",
+      "maxItems": 10
+    },
+    "preview": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Thumbnail image (png, jpg or webp), relative to the package root."
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/Property"
+      },
+      "description": "User-adjustable settings, rendered by the app and delivered to the\nwallpaper through `wallweaver.onProperties()`. Order is kept."
+    },
+    "permissions": {
+      "$ref": "#/$defs/Permissions",
+      "description": "What the package asks to use. Anything not listed is denied.",
+      "default": {}
+    }
+  },
+  "required": [
+    "manifestVersion",
+    "id",
+    "name",
+    "version",
+    "type",
+    "entry",
+    "author",
+    "license"
+  ],
+  "title": "Wallweaver wallpaper.json",
+  "description": "Manifest for a Wallweaver wallpaper or theme package (schema v1).",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "WallpaperType": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "web",
+          "description": "HTML, CSS and JavaScript (including WebGL and WebGPU)."
+        },
+        {
+          "type": "string",
+          "const": "video",
+          "description": "A looping video file (mp4 or webm)."
+        },
+        {
+          "type": "string",
+          "const": "shader",
+          "description": "A GLSL fragment shader run by the SDK's WebGL2 host."
+        },
+        {
+          "type": "string",
+          "const": "theme",
+          "description": "Color tokens, fonts and optional wallpaper bindings."
+        }
+      ],
+      "description": "Package type."
+    },
+    "Author": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name or handle.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional https link to the author's page."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Package author."
+    },
+    "Property": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "slider"
+            },
+            "label": {
+              "type": "string",
+              "description": "Label shown next to the control."
+            },
+            "default": {
+              "type": "number",
+              "format": "double",
+              "description": "Starting value. Must be between `min` and `max`."
+            },
+            "min": {
+              "type": "number",
+              "format": "double",
+              "description": "Smallest allowed value."
+            },
+            "max": {
+              "type": "number",
+              "format": "double",
+              "description": "Largest allowed value."
+            },
+            "step": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "format": "double",
+              "description": "Step between values. Defaults to a smooth slider."
+            }
+          },
+          "required": [
+            "type",
+            "label",
+            "default",
+            "min",
+            "max"
+          ],
+          "description": "A number picked on a slider."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "color"
+            },
+            "label": {
+              "type": "string",
+              "description": "Label shown next to the control."
+            },
+            "default": {
+              "type": "string",
+              "description": "Starting color."
+            }
+          },
+          "required": [
+            "type",
+            "label",
+            "default"
+          ],
+          "description": "A color, as `#RRGGBB` or `#RRGGBBAA`."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "bool"
+            },
+            "label": {
+              "type": "string",
+              "description": "Label shown next to the control."
+            },
+            "default": {
+              "type": "boolean",
+              "description": "Starting value."
+            }
+          },
+          "required": [
+            "type",
+            "label",
+            "default"
+          ],
+          "description": "An on/off toggle."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "combo"
+            },
+            "label": {
+              "type": "string",
+              "description": "Label shown next to the control."
+            },
+            "default": {
+              "type": "string",
+              "description": "The `value` of the option selected at first."
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ComboOption"
+              },
+              "description": "The choices, in display order."
+            }
+          },
+          "required": [
+            "type",
+            "label",
+            "default",
+            "options"
+          ],
+          "description": "One choice from a fixed list."
+        }
+      ],
+      "description": "A user-adjustable property."
+    },
+    "ComboOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "Value delivered to the wallpaper."
+        },
+        "label": {
+          "type": "string",
+          "description": "Text shown to the user."
+        }
+      },
+      "required": [
+        "value",
+        "label"
+      ],
+      "description": "One entry in a combo property."
+    },
+    "Permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "audio": {
+          "type": "boolean",
+          "description": "Audio levels of what is playing (64 frequency bars). Never the\nmicrophone and never raw audio."
+        },
+        "system.stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatKind"
+          },
+          "description": "System usage figures the package wants, refreshed once a second."
+        },
+        "weather": {
+          "type": "boolean",
+          "description": "City-level weather supplied by Wallweaver's weather plugin."
+        },
+        "calendar": {
+          "type": "boolean",
+          "description": "Upcoming calendar events from a calendar the user picks."
+        },
+        "network": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Origins the package may contact directly, such as\n`https://api.open-meteo.com`. https and wss only, no paths, no\nwildcards, no local network addresses. At most 8.",
+          "maxItems": 8
+        },
+        "input.mouse": {
+          "type": "boolean",
+          "description": "Pointer position while the desktop is visible. No clicks or keys."
+        },
+        "script.eval": {
+          "type": "boolean",
+          "description": "Allow `eval()` and `new Function()`. Avoid it if you can; the consent\nscreen marks it as a risk."
+        }
+      },
+      "description": "Permissions a package asks for. Everything defaults to denied, and the\nuser still has to approve each one on the consent screen."
+    },
+    "StatKind": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "cpu",
+          "description": "Total CPU usage in percent."
+        },
+        {
+          "type": "string",
+          "const": "gpu",
+          "description": "GPU usage in percent."
+        },
+        {
+          "type": "string",
+          "const": "ram",
+          "description": "Memory usage in percent."
+        },
+        {
+          "type": "string",
+          "const": "net",
+          "description": "Network throughput in bytes per second (no addresses, no content)."
+        }
+      ],
+      "description": "A system statistic a package can ask for."
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json"
+}

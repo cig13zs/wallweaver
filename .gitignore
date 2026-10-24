@@ -1,0 +1,17 @@
+/target
+**/target
+node_modules/
+dist/
+*.wwp
+*.wwkey
+.DS_Store
+Thumbs.db
+/test-results
+/playwright-report
+/apps/manager-ui/test-results
+/apps/manager-ui/playwright-report
+/crates/ww-package/fuzz/corpus
+/crates/ww-package/fuzz/artifacts
+/crates/ww-package/fuzz/coverage
+.env
+.env.*

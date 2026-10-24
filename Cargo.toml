@@ -1,0 +1,38 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+exclude = ["crates/ww-package/fuzz"]
+
+[workspace.package]
+version = "0.1.0-alpha.1"
+edition = "2024"
+rust-version = "1.90"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/cig13zs/wallweaver"
+homepage = "https://github.com/cig13zs/wallweaver"
+authors = ["Wallweaver contributors"]
+
+[workspace.dependencies]
+ww-manifest = { path = "crates/ww-manifest", version = "0.1.0-alpha.1" }
+ww-package = { path = "crates/ww-package", version = "0.1.0-alpha.1" }
+ww-permissions = { path = "crates/ww-permissions", version = "0.1.0-alpha.1" }
+ww-governor = { path = "crates/ww-governor", version = "0.1.0-alpha.1" }
+ww-desktop = { path = "crates/ww-desktop", version = "0.1.0-alpha.1" }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+todo = "warn"
+unwrap_used = "warn"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
