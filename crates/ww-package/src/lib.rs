@@ -21,7 +21,7 @@
 //!   while it is read, reading at most its declared size plus one byte, so
 //!   zip headers that lie about sizes don't matter
 //! * file count and total size are capped (500 MB for video packages,
-//!   50 MB for everything else)
+//!   200 MB for slideshows, 50 MB for everything else)
 //! * [`unpack`] writes into a fresh staging folder with `create_new` and only
 //!   moves it into place once every hash has matched
 //!
@@ -72,6 +72,7 @@ impl Limits {
     pub fn for_type(kind: WallpaperType) -> Limits {
         let max_total_size = match kind {
             WallpaperType::Video => 500 * MIB,
+            WallpaperType::Slideshow => 200 * MIB,
             _ => 50 * MIB,
         };
         Limits {

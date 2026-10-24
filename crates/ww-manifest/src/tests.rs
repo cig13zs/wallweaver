@@ -481,3 +481,132 @@ fn checked_in_schema_is_current() {
         "schema/wallpaper.schema.json is stale; rerun with WW_UPDATE_SCHEMA=1"
     );
 }
+
+fn native(kind: &str, entry: &str) -> serde_json::Value {
+    json!({
+        "manifestVersion": 1, "id": "mira.native", "name": "Native", "version": "1.0.0",
+        "type": kind, "entry": entry, "author": { "name": "mira" }, "license": "CC0-1.0"
+    })
+}
+
+#[test]
+fn native_types_accept_their_entries() {
+    for (kind, entry) in [
+        ("image", "dunes.jpg"),
+        ("image", "dunes.webp"),
+        ("animated", "rain.gif"),
+        ("animated", "rain.webp"),
+        ("animated", "rain.apng"),
+        ("shader", "plasma.wgsl"),
+        ("shader", "plasma.frag"),
+        ("shader", "plasma.glsl"),
+    ] {
+        let m = parse(&native(kind, entry)).unwrap_or_else(|e| panic!("{kind} {entry}: {e}"));
+        assert!(!m.kind.needs_webview(), "{kind}");
+    }
+    for (kind, entry) in [
+        ("image", "dunes.gif"),
+        ("animated", "x.mp4"),
+        ("shader", "x.js"),
+    ] {
+        assert!(
+            has_issue(&issues_for(&native(kind, entry)), "entry"),
+            "{kind} {entry}"
+        );
+    }
+    assert!(WallpaperType::Web.needs_webview());
+}
+
+#[test]
+fn slideshow_rules() {
+    let mut v = native("slideshow", "a.jpg");
+    assert!(has_issue(&issues_for(&v), "slideshow"), "section required");
+
+    v["slideshow"] = json!({ "images": ["a.jpg", "b/c.png"], "interval": 60, "shuffle": true });
+    let m = parse(&v).unwrap();
+    let show = m.slideshow.as_ref().unwrap();
+    assert_eq!(show.interval, 60);
+    assert!(show.shuffle);
+    assert_eq!(
+        m.referenced_files(),
+        vec![("entry", "a.jpg"), ("slideshow.images", "b/c.png")]
+    );
+
+    v["slideshow"] = json!({ "images": ["a.jpg"] });
+    assert_eq!(
+        parse(&v).unwrap().slideshow.unwrap().interval,
+        Slideshow::DEFAULT_INTERVAL
+    );
+
+    v["slideshow"] = json!({ "images": ["a.jpg", "a.jpg", "../x.png", "c.gif"], "interval": 1 });
+    let issues = issues_for(&v);
+    for path in [
+        "slideshow.images[1]",
+        "slideshow.images[2]",
+        "slideshow.images[3]",
+        "slideshow.interval",
+    ] {
+        assert!(has_issue(&issues, path), "{path}: {issues:?}");
+    }
+
+    v["slideshow"] = json!({ "images": ["b.jpg"] });
+    assert!(has_issue(&issues_for(&v), "entry"), "entry must be listed");
+
+    let mut img = native("image", "a.jpg");
+    img["slideshow"] = json!({ "images": ["a.jpg"] });
+    assert!(
+        has_issue(&issues_for(&img), "slideshow"),
+        "only on slideshows"
+    );
+}
+
+#[test]
+fn render_rules() {
+    let mut v = native("shader", "s.wgsl");
+    v["render"] = json!({ "fit": "contain", "maxFps": 60, "background": "#102030" });
+    let m = parse(&v).unwrap();
+    assert_eq!(m.render.fit, Some(Fit::Contain));
+    assert_eq!(m.render.max_fps, Some(60));
+
+    v["render"] = json!({ "maxFps": 0, "background": "#10203040" });
+    let issues = issues_for(&v);
+    assert!(has_issue(&issues, "render.maxFps"));
+    assert!(has_issue(&issues, "render.background"));
+
+    v["render"] = json!({ "vsync": false });
+    assert!(matches!(parse(&v), Err(ManifestError::Shape { .. })));
+}
+
+#[test]
+fn local_files_get_a_valid_manifest() {
+    let m = Manifest::for_local_file("My Holiday (2).JPG").unwrap();
+    assert_eq!(m.kind, WallpaperType::Image);
+    assert_eq!(m.id, "local.my-holiday-2");
+    assert_eq!(m.name, "My Holiday (2)");
+    assert!(m.permissions.is_empty());
+
+    assert_eq!(
+        Manifest::for_local_file("rain.gif").unwrap().kind,
+        WallpaperType::Animated
+    );
+    assert_eq!(
+        Manifest::for_local_file("plasma.frag").unwrap().kind,
+        WallpaperType::Shader
+    );
+    assert_eq!(
+        Manifest::for_local_file("site.html").unwrap().kind,
+        WallpaperType::Web
+    );
+    assert!(Manifest::for_local_file("notes.txt").is_none());
+    assert!(Manifest::for_local_file("../escape.png").is_none());
+    let odd = Manifest::for_local_file("___.png").unwrap();
+    assert_eq!(odd.id, "local.wallpaper");
+}
+
+#[test]
+fn every_type_round_trips_its_name() {
+    for kind in WallpaperType::ALL {
+        let v: WallpaperType = serde_json::from_value(json!(kind.as_str())).unwrap();
+        assert_eq!(v, kind);
+    }
+}

@@ -87,6 +87,21 @@
       "$ref": "#/$defs/Permissions",
       "description": "What the package asks to use. Anything not listed is denied.",
       "default": {}
+    },
+    "slideshow": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Slideshow"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Images and timing for a `slideshow` package. Not allowed on other types."
+    },
+    "render": {
+      "$ref": "#/$defs/Render",
+      "description": "How the native renderer should draw the wallpaper. Every field is\noptional and the defaults suit most wallpapers."
     }
   },
   "required": [
@@ -107,8 +122,23 @@
       "oneOf": [
         {
           "type": "string",
-          "const": "web",
-          "description": "HTML, CSS and JavaScript (including WebGL and WebGPU)."
+          "const": "image",
+          "description": "A still image (png, jpg or webp)."
+        },
+        {
+          "type": "string",
+          "const": "slideshow",
+          "description": "Several still images shown in turn. List them in `slideshow.images`."
+        },
+        {
+          "type": "string",
+          "const": "animated",
+          "description": "An animated image: GIF, animated WebP or APNG."
+        },
+        {
+          "type": "string",
+          "const": "shader",
+          "description": "A fragment shader: WGSL, or GLSL written the Shadertoy way\n(`mainImage(out vec4, in vec2)` with `iTime`, `iResolution`, `iMouse`)."
         },
         {
           "type": "string",
@@ -117,8 +147,8 @@
         },
         {
           "type": "string",
-          "const": "shader",
-          "description": "A GLSL fragment shader run by the SDK's WebGL2 host."
+          "const": "web",
+          "description": "HTML, CSS and JavaScript (including WebGL and WebGPU). The only type\nthat runs in a web view."
         },
         {
           "type": "string",
@@ -126,7 +156,7 @@
           "description": "Color tokens, fonts and optional wallpaper bindings."
         }
       ],
-      "description": "Package type."
+      "description": "Package type. Everything except `web` is drawn by Wallweaver's native\nrenderer, so no browser engine is loaded for it."
     },
     "Author": {
       "type": "object",
@@ -366,6 +396,97 @@
         }
       ],
       "description": "A system statistic a package can ask for."
+    },
+    "Slideshow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Image paths in display order. `entry` must be one of them; it is shown\nfirst and used as the still snapshot.",
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "interval": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 5,
+          "description": "Seconds each image stays up, 5 to 86400. Defaults to 300.",
+          "maximum": 86400,
+          "default": 300
+        },
+        "shuffle": {
+          "type": "boolean",
+          "description": "Show the images in random order."
+        }
+      },
+      "required": [
+        "images"
+      ],
+      "description": "Images and timing for a slideshow."
+    },
+    "Render": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Fit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "How an image that doesn't match the screen's shape is fitted."
+        },
+        "maxFps": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 1,
+          "description": "Highest frame rate the wallpaper needs, 1 to 240. Animated images use\ntheir own frame timing up to this cap; shaders default to 30.",
+          "maximum": 240
+        },
+        "background": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Color behind letterboxed images, `#RRGGBB`. Defaults to black."
+        }
+      },
+      "description": "Rendering hints."
+    },
+    "Fit": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "cover",
+          "description": "Fill the screen and crop the overflow. The default."
+        },
+        {
+          "type": "string",
+          "const": "contain",
+          "description": "Show the whole image, letterboxed."
+        },
+        {
+          "type": "string",
+          "const": "stretch",
+          "description": "Stretch to the screen, ignoring the aspect ratio."
+        },
+        {
+          "type": "string",
+          "const": "center",
+          "description": "Draw at native size, centered."
+        }
+      ],
+      "description": "How an image is fitted to the screen."
     }
   },
   "$id": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json"

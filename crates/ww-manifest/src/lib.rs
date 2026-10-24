@@ -112,29 +112,127 @@ pub struct Manifest {
     /// What the package asks to use. Anything not listed is denied.
     #[serde(default)]
     pub permissions: Permissions,
+
+    /// Images and timing for a `slideshow` package. Not allowed on other types.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub slideshow: Option<Slideshow>,
+
+    /// How the native renderer should draw the wallpaper. Every field is
+    /// optional and the defaults suit most wallpapers.
+    #[serde(default, skip_serializing_if = "Render::is_default")]
+    pub render: Render,
 }
 
-/// Package type.
+/// Images and timing for a slideshow.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Slideshow {
+    /// Image paths in display order. `entry` must be one of them; it is shown
+    /// first and used as the still snapshot.
+    #[schemars(length(min = 1, max = 1000))]
+    pub images: Vec<String>,
+    /// Seconds each image stays up, 5 to 86400. Defaults to 300.
+    #[serde(default = "Slideshow::default_interval")]
+    #[schemars(range(min = 5, max = 86400))]
+    pub interval: u32,
+    /// Show the images in random order.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub shuffle: bool,
+}
+
+impl Slideshow {
+    /// Default seconds per image.
+    pub const DEFAULT_INTERVAL: u32 = 300;
+
+    fn default_interval() -> u32 {
+        Self::DEFAULT_INTERVAL
+    }
+}
+
+/// Rendering hints.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Render {
+    /// How an image that doesn't match the screen's shape is fitted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fit: Option<Fit>,
+    /// Highest frame rate the wallpaper needs, 1 to 240. Animated images use
+    /// their own frame timing up to this cap; shaders default to 30.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(range(min = 1, max = 240))]
+    pub max_fps: Option<u32>,
+    /// Color behind letterboxed images, `#RRGGBB`. Defaults to black.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub background: Option<String>,
+}
+
+impl Render {
+    fn is_default(&self) -> bool {
+        self == &Render::default()
+    }
+}
+
+/// How an image is fitted to the screen.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum Fit {
+    /// Fill the screen and crop the overflow. The default.
+    #[default]
+    Cover,
+    /// Show the whole image, letterboxed.
+    Contain,
+    /// Stretch to the screen, ignoring the aspect ratio.
+    Stretch,
+    /// Draw at native size, centered.
+    Center,
+}
+
+/// Package type. Everything except `web` is drawn by Wallweaver's native
+/// renderer, so no browser engine is loaded for it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum WallpaperType {
-    /// HTML, CSS and JavaScript (including WebGL and WebGPU).
-    Web,
+    /// A still image (png, jpg or webp).
+    Image,
+    /// Several still images shown in turn. List them in `slideshow.images`.
+    Slideshow,
+    /// An animated image: GIF, animated WebP or APNG.
+    Animated,
+    /// A fragment shader: WGSL, or GLSL written the Shadertoy way
+    /// (`mainImage(out vec4, in vec2)` with `iTime`, `iResolution`, `iMouse`).
+    Shader,
     /// A looping video file (mp4 or webm).
     Video,
-    /// A GLSL fragment shader run by the SDK's WebGL2 host.
-    Shader,
+    /// HTML, CSS and JavaScript (including WebGL and WebGPU). The only type
+    /// that runs in a web view.
+    Web,
     /// Color tokens, fonts and optional wallpaper bindings.
     Theme,
 }
 
+/// Extensions of still images the native renderer decodes.
+pub const IMAGE_EXTENSIONS: &[&str] = &["png", "jpg", "jpeg", "webp"];
+
 impl WallpaperType {
+    /// Every type, in manifest order.
+    pub const ALL: [WallpaperType; 7] = [
+        WallpaperType::Image,
+        WallpaperType::Slideshow,
+        WallpaperType::Animated,
+        WallpaperType::Shader,
+        WallpaperType::Video,
+        WallpaperType::Web,
+        WallpaperType::Theme,
+    ];
+
     /// File extensions accepted for the `entry` file of this type.
     pub fn entry_extensions(self) -> &'static [&'static str] {
         match self {
-            WallpaperType::Web => &["html", "htm"],
+            WallpaperType::Image | WallpaperType::Slideshow => IMAGE_EXTENSIONS,
+            WallpaperType::Animated => &["gif", "webp", "png", "apng"],
+            WallpaperType::Shader => &["wgsl", "frag", "glsl"],
             WallpaperType::Video => &["mp4", "webm"],
-            WallpaperType::Shader => &["frag", "glsl"],
+            WallpaperType::Web => &["html", "htm"],
             WallpaperType::Theme => &["json"],
         }
     }
@@ -142,11 +240,36 @@ impl WallpaperType {
     /// Lowercase name as it appears in the manifest.
     pub fn as_str(self) -> &'static str {
         match self {
-            WallpaperType::Web => "web",
-            WallpaperType::Video => "video",
+            WallpaperType::Image => "image",
+            WallpaperType::Slideshow => "slideshow",
+            WallpaperType::Animated => "animated",
             WallpaperType::Shader => "shader",
+            WallpaperType::Video => "video",
+            WallpaperType::Web => "web",
             WallpaperType::Theme => "theme",
         }
+    }
+
+    /// True if this type needs a web view. Only `web` does.
+    pub fn needs_webview(self) -> bool {
+        self == WallpaperType::Web
+    }
+
+    /// Guess the type for a single dropped file from its extension, for
+    /// "drop any file and it's a wallpaper". `png` is treated as a still
+    /// image; an APNG is detected later by the decoder.
+    pub fn guess_from_file_name(name: &str) -> Option<WallpaperType> {
+        let ext = path::extension(name)?;
+        let ext = ext.as_str();
+        Some(match ext {
+            "png" | "jpg" | "jpeg" => WallpaperType::Image,
+            "webp" => WallpaperType::Image,
+            "gif" | "apng" => WallpaperType::Animated,
+            "wgsl" | "frag" | "glsl" => WallpaperType::Shader,
+            "mp4" | "webm" => WallpaperType::Video,
+            "html" | "htm" => WallpaperType::Web,
+            _ => return None,
+        })
     }
 }
 
@@ -374,6 +497,86 @@ impl Manifest {
             .iter()
             .map(|(k, p)| (k.clone(), p.default_value()))
             .collect()
+    }
+
+    /// Build a manifest for a single file the user dropped onto Wallweaver,
+    /// so any image, GIF, shader, video or web page works without writing
+    /// `wallpaper.json` by hand. Returns `None` for file types Wallweaver
+    /// can't show. The result is validated.
+    pub fn for_local_file(file_name: &str) -> Option<Manifest> {
+        let kind = WallpaperType::guess_from_file_name(file_name)?;
+        let stem = file_name
+            .rsplit('/')
+            .next()
+            .and_then(|n| n.rsplit_once('.').map(|(s, _)| s))
+            .unwrap_or("wallpaper");
+        let slug: String = stem
+            .chars()
+            .map(|c| {
+                if c.is_ascii_alphanumeric() {
+                    c.to_ascii_lowercase()
+                } else {
+                    '-'
+                }
+            })
+            .collect::<String>()
+            .split('-')
+            .filter(|p| !p.is_empty())
+            .collect::<Vec<_>>()
+            .join("-");
+        let slug = if slug.is_empty() {
+            "wallpaper".into()
+        } else {
+            slug
+        };
+        let mut id = format!("local.{slug}");
+        id.truncate(64);
+        let id = id.trim_end_matches(['-', '.']).to_string();
+        let name: String = stem.chars().filter(|c| !c.is_control()).take(80).collect();
+        let manifest = Manifest {
+            schema: None,
+            manifest_version: MANIFEST_VERSION,
+            id,
+            name: if name.trim().is_empty() {
+                "Wallpaper".into()
+            } else {
+                name
+            },
+            version: semver::Version::new(0, 0, 0),
+            kind,
+            entry: file_name.to_string(),
+            author: Author {
+                name: "me".into(),
+                url: None,
+            },
+            license: "LicenseRef-Personal".into(),
+            description: None,
+            tags: Vec::new(),
+            preview: None,
+            properties: IndexMap::new(),
+            permissions: Permissions::default(),
+            slideshow: None,
+            render: Render::default(),
+        };
+        manifest.validate().ok()?;
+        Some(manifest)
+    }
+
+    /// Every package file the manifest points at: `entry`, `preview` and
+    /// slideshow images, without duplicates, as `(field, path)` pairs.
+    pub fn referenced_files(&self) -> Vec<(&'static str, &str)> {
+        let mut out = vec![("entry", self.entry.as_str())];
+        if let Some(p) = &self.preview {
+            out.push(("preview", p.as_str()));
+        }
+        if let Some(show) = &self.slideshow {
+            for img in &show.images {
+                if !out.iter().any(|(_, p)| *p == img.as_str()) {
+                    out.push(("slideshow.images", img.as_str()));
+                }
+            }
+        }
+        out
     }
 
     /// Serialize back to pretty JSON.

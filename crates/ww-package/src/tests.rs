@@ -673,3 +673,32 @@ fn pack_enforces_file_count() {
         Err(PackageError::TooManyFiles { .. })
     ));
 }
+
+#[test]
+fn slideshow_images_must_all_be_packed() {
+    let manifest = r#"{
+      "manifestVersion": 1, "id": "test.show", "name": "Show", "version": "1.0.0",
+      "type": "slideshow", "entry": "a.jpg", "author": { "name": "t" }, "license": "CC0-1.0",
+      "slideshow": { "images": ["a.jpg", "b.jpg"], "interval": 30 }
+    }"#;
+    let dir = tempfile::tempdir().unwrap();
+    write_tree(
+        dir.path(),
+        &[("wallpaper.json", manifest.as_bytes()), ("a.jpg", b"jpg")],
+    );
+    let err = pack_dir(dir.path(), Cursor::new(Vec::new())).unwrap_err();
+    assert!(
+        matches!(
+            &err,
+            PackageError::ReferencedFileMissing { field: "slideshow.images", path } if path == "b.jpg"
+        ),
+        "{err:?}"
+    );
+    write_tree(dir.path(), &[("b.jpg", b"jpg2")]);
+    let pkg = verify_dev(&pack_bytes(dir.path())).unwrap();
+    assert_eq!(pkg.manifest.slideshow.unwrap().images.len(), 2);
+    assert_eq!(
+        Limits::for_type(WallpaperType::Slideshow).max_total_size,
+        200 * MIB
+    );
+}

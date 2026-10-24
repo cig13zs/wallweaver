@@ -156,19 +156,13 @@ pub(crate) fn check_references(
     manifest: &Manifest,
     checksums: &Checksums,
 ) -> Result<(), PackageError> {
-    if checksums.get(&manifest.entry).is_none() {
-        return Err(PackageError::ReferencedFileMissing {
-            field: "entry",
-            path: manifest.entry.clone(),
-        });
-    }
-    if let Some(preview) = &manifest.preview
-        && checksums.get(preview).is_none()
-    {
-        return Err(PackageError::ReferencedFileMissing {
-            field: "preview",
-            path: preview.clone(),
-        });
+    for (field, path) in manifest.referenced_files() {
+        if checksums.get(path).is_none() {
+            return Err(PackageError::ReferencedFileMissing {
+                field,
+                path: path.to_string(),
+            });
+        }
     }
     Ok(())
 }

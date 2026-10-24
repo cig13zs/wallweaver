@@ -1,7 +1,9 @@
 use std::collections::HashSet;
 
 use crate::path::{check_relative_path, extension};
-use crate::{Issue, MANIFEST_VERSION, Manifest, NetworkOrigin, Property};
+use crate::{
+    IMAGE_EXTENSIONS, Issue, MANIFEST_VERSION, Manifest, NetworkOrigin, Property, WallpaperType,
+};
 
 const MAX_NAME: usize = 80;
 const MAX_DESCRIPTION: usize = 500;
@@ -12,6 +14,7 @@ const MAX_LABEL: usize = 40;
 const MAX_COMBO_OPTIONS: usize = 32;
 const MAX_NETWORK_ORIGINS: usize = 8;
 const PREVIEW_EXTENSIONS: &[&str] = &["png", "jpg", "jpeg", "webp"];
+const MAX_SLIDESHOW_IMAGES: usize = 1000;
 
 pub(crate) fn check(m: &Manifest) -> Vec<Issue> {
     let mut issues = Vec::new();
@@ -142,6 +145,9 @@ pub(crate) fn check(m: &Manifest) -> Vec<Issue> {
         );
         check_property(prop, &base, &mut push);
     }
+
+    check_slideshow(m, &mut push);
+    check_render(m, &mut push);
 
     let perms = &m.permissions;
     let mut seen_stats = HashSet::new();
@@ -297,5 +303,80 @@ fn check_property(prop: &Property, base: &str, push: &mut impl FnMut(&str, Strin
                 );
             }
         }
+    }
+}
+
+fn check_slideshow(m: &Manifest, push: &mut impl FnMut(&str, String)) {
+    let Some(show) = &m.slideshow else {
+        if m.kind == WallpaperType::Slideshow {
+            push(
+                "slideshow",
+                "a slideshow package needs a slideshow section listing its images".to_string(),
+            );
+        }
+        return;
+    };
+    if m.kind != WallpaperType::Slideshow {
+        push(
+            "slideshow",
+            format!(
+                "only slideshow packages can have a slideshow section, not {}",
+                m.kind
+            ),
+        );
+        return;
+    }
+    if show.images.is_empty() || show.images.len() > MAX_SLIDESHOW_IMAGES {
+        push(
+            "slideshow.images",
+            format!("needs between 1 and {MAX_SLIDESHOW_IMAGES} images"),
+        );
+    }
+    if !(5..=86_400).contains(&show.interval) {
+        push(
+            "slideshow.interval",
+            format!("{} seconds is out of range; use 5 to 86400", show.interval),
+        );
+    }
+    let mut seen = HashSet::new();
+    for (i, img) in show.images.iter().enumerate() {
+        let path = format!("slideshow.images[{i}]");
+        match check_relative_path(img) {
+            Err(e) => push(&path, e.to_string()),
+            Ok(()) => {
+                let ext = extension(img).unwrap_or_default();
+                if !IMAGE_EXTENSIONS.contains(&ext.as_str()) {
+                    push(&path, "must be a .png, .jpg or .webp image".to_string());
+                }
+                if !seen.insert(img.as_str()) {
+                    push(&path, format!("'{img}' is listed twice"));
+                }
+            }
+        }
+    }
+    if !show.images.iter().any(|i| i == &m.entry) {
+        push(
+            "entry",
+            "a slideshow's entry must be one of slideshow.images".to_string(),
+        );
+    }
+}
+
+fn check_render(m: &Manifest, push: &mut impl FnMut(&str, String)) {
+    if let Some(fps) = m.render.max_fps
+        && !(1..=240).contains(&fps)
+    {
+        push(
+            "render.maxFps",
+            format!("{fps} is out of range; use 1 to 240"),
+        );
+    }
+    if let Some(bg) = &m.render.background
+        && (bg.len() != 7 || !valid_color(bg))
+    {
+        push(
+            "render.background",
+            format!("'{bg}' is not a color; use #RRGGBB"),
+        );
     }
 }
