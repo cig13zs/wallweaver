@@ -17,6 +17,7 @@ use std::collections::BTreeMap;
 use std::num::NonZeroU32;
 use std::os::fd::AsRawFd;
 use std::ptr::NonNull;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use raw_window_handle::{RawDisplayHandle, RawWindowHandle, XcbDisplayHandle, XcbWindowHandle};
@@ -34,7 +35,7 @@ use x11rb::xcb_ffi::XCBConnection;
 
 use crate::geometry::{Rect, covered_fraction, monitor_for};
 use crate::power::read_power_supplies;
-use crate::{DesktopError, DesktopHost, HostEvent, HostWindow, Monitor};
+use crate::{DesktopError, DesktopHost, HostEvent, HostWindow, Monitor, Waker};
 
 struct Atoms {
     net_wm_window_type: u32,
@@ -53,11 +54,13 @@ struct Atoms {
     net_wm_pid: u32,
     net_wm_name: u32,
     utf8_string: u32,
+    wake: u32,
 }
 
 /// The X11 desktop host.
 pub struct X11Host {
-    conn: XCBConnection,
+    conn: Arc<XCBConnection>,
+    wake_window: Window,
     screen: usize,
     root: Window,
     atoms: Atoms,
@@ -109,7 +112,24 @@ impl X11Host {
             net_wm_pid: intern(b"_NET_WM_PID")?,
             net_wm_name: intern(b"_NET_WM_NAME")?,
             utf8_string: intern(b"UTF8_STRING")?,
+            wake: intern(b"_WALLWEAVER_WAKE")?,
         };
+        // An unmapped input-only window that receives wake-up messages.
+        let wake_window = conn.generate_id().map_err(err)?;
+        conn.create_window(
+            0,
+            wake_window,
+            root,
+            0,
+            0,
+            1,
+            1,
+            0,
+            WindowClass::INPUT_ONLY,
+            x11rb::COPY_FROM_PARENT,
+            &CreateWindowAux::new(),
+        )
+        .map_err(err)?;
         let randr = conn
             .randr_query_version(1, 5)
             .ok()
@@ -126,7 +146,8 @@ impl X11Host {
         );
         let _ = conn.flush();
         Ok(X11Host {
-            conn,
+            conn: Arc::new(conn),
+            wake_window,
             screen,
             root,
             atoms,
@@ -420,6 +441,10 @@ impl DesktopHost for X11Host {
         Some((i32::from(p.root_x), i32::from(p.root_y)))
     }
 
+    fn waker(&self) -> Waker {
+        self.make_waker()
+    }
+
     fn pump(&mut self, timeout: Duration) -> Vec<HostEvent> {
         let deadline = Instant::now() + timeout;
         let mut events = Vec::new();
@@ -429,6 +454,11 @@ impl DesktopHost for X11Host {
                     Event::RandrScreenChangeNotify(_) => events.push(HostEvent::MonitorsChanged),
                     Event::PropertyNotify(p) if p.atom == self.atoms.net_active_window => {
                         events.push(HostEvent::SignalsChanged)
+                    }
+                    Event::ClientMessage(m)
+                        if m.window == self.wake_window && m.type_ == self.atoms.wake =>
+                    {
+                        events.push(HostEvent::Woken)
                     }
                     _ => {}
                 }
@@ -447,6 +477,19 @@ impl DesktopHost for X11Host {
             // SAFETY: pfd is a single valid pollfd for the duration of the call.
             unsafe { libc::poll(&mut pfd, 1, ms) };
         }
+    }
+}
+
+impl X11Host {
+    fn make_waker(&self) -> Waker {
+        let conn = self.conn.clone();
+        let window = self.wake_window;
+        let ty = self.atoms.wake;
+        Waker::new(move || {
+            let ev = x11rb::protocol::xproto::ClientMessageEvent::new(32, window, ty, [0u32; 5]);
+            let _ = conn.send_event(false, window, EventMask::NO_EVENT, ev);
+            let _ = conn.flush();
+        })
     }
 }
 

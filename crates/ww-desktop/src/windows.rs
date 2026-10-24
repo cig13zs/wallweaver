@@ -42,7 +42,14 @@ use windows::Win32::System::Threading::{
     OpenProcess, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION, QueryFullProcessImageNameW,
 };
 use windows::Win32::UI::Shell::{
-    QUNS_BUSY, QUNS_PRESENTATION_MODE, QUNS_RUNNING_D3D_FULL_SCREEN, SHQueryUserNotificationState,
+    NIF_ICON, NIF_MESSAGE, NIF_TIP, NIM_ADD, NIM_DELETE, NIM_MODIFY, NOTIFYICONDATAW, QUNS_BUSY,
+    QUNS_PRESENTATION_MODE, QUNS_RUNNING_D3D_FULL_SCREEN, SHQueryUserNotificationState,
+    Shell_NotifyIconW,
+};
+use windows::Win32::UI::WindowsAndMessaging::{
+    AppendMenuW, CreatePopupMenu, DestroyMenu, IDI_APPLICATION, LoadIconW, MF_STRING, PostMessageW,
+    SetForegroundWindow, TPM_RETURNCMD, TPM_RIGHTBUTTON, TrackPopupMenu, WM_APP, WM_CONTEXTMENU,
+    WM_LBUTTONDBLCLK, WM_RBUTTONUP,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     CS_HREDRAW, CS_VREDRAW, CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW,
@@ -61,7 +68,7 @@ use windows::core::{BOOL, PCWSTR, PWSTR, w};
 use ww_governor::{MonitorId, MonitorSignals, Signals};
 
 use crate::geometry::{Rect, covered_fraction, monitor_for};
-use crate::{DesktopError, DesktopHost, HostEvent, HostWindow, Monitor};
+use crate::{DesktopError, DesktopHost, HostEvent, HostWindow, Monitor, Waker};
 
 const WALLPAPER_CLASS: PCWSTR = w!("WallweaverWallpaper");
 const MESSAGE_CLASS: PCWSTR = w!("WallweaverHostMessages");
@@ -86,7 +93,14 @@ pub fn detect_layout(progman_ex_style: u32) -> Layout {
     }
 }
 
+const WM_WAKE: u32 = WM_APP + 1;
+const WM_TRAY: u32 = WM_APP + 2;
+const TRAY_OPEN: usize = 1;
+const TRAY_PAUSE: usize = 2;
+const TRAY_QUIT: usize = 3;
+
 thread_local! {
+    static TRAY_PAUSED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
     static EVENTS: std::cell::RefCell<Vec<HostEvent>> = const { std::cell::RefCell::new(Vec::new()) };
     static TASKBAR_CREATED: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
 }
@@ -102,6 +116,17 @@ extern "system" fn wallpaper_proc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
 
 extern "system" fn message_proc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     let event = match msg {
+        WM_WAKE => Some(HostEvent::Woken),
+        WM_TRAY => {
+            let mouse = (lparam.0 as u32) & 0xffff;
+            if mouse == WM_RBUTTONUP || mouse == WM_CONTEXTMENU {
+                tray_menu(hwnd)
+            } else if mouse == WM_LBUTTONDBLCLK {
+                Some(HostEvent::TrayOpenManager)
+            } else {
+                None
+            }
+        }
         WM_DISPLAYCHANGE | WM_SETTINGCHANGE => Some(HostEvent::MonitorsChanged),
         WM_POWERBROADCAST | WM_WTSSESSION_CHANGE => Some(HostEvent::SignalsChanged),
         m if m != 0 && m == TASKBAR_CREATED.with(|c| c.get()) => Some(HostEvent::ShellRestarted),
@@ -114,6 +139,48 @@ extern "system" fn message_proc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LP
     unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) }
 }
 
+/// Show the tray menu and return the chosen action.
+fn tray_menu(hwnd: HWND) -> Option<HostEvent> {
+    let paused = TRAY_PAUSED.with(|p| p.get());
+    // SAFETY: the menu is created, shown and destroyed within this function;
+    // all strings are NUL-terminated literals.
+    unsafe {
+        let menu = CreatePopupMenu().ok()?;
+        let _ = AppendMenuW(menu, MF_STRING, TRAY_OPEN, w!("Open Wallweaver"));
+        let _ = AppendMenuW(
+            menu,
+            MF_STRING,
+            TRAY_PAUSE,
+            if paused {
+                w!("Resume wallpapers")
+            } else {
+                w!("Pause wallpapers")
+            },
+        );
+        let _ = AppendMenuW(menu, MF_STRING, TRAY_QUIT, w!("Quit"));
+        let mut pt = POINT::default();
+        let _ = GetCursorPos(&mut pt);
+        // Required so the menu closes when the user clicks elsewhere.
+        let _ = SetForegroundWindow(hwnd);
+        let cmd = TrackPopupMenu(
+            menu,
+            TPM_RETURNCMD | TPM_RIGHTBUTTON,
+            pt.x,
+            pt.y,
+            None,
+            hwnd,
+            None,
+        );
+        let _ = DestroyMenu(menu);
+        match cmd.0 as usize {
+            TRAY_OPEN => Some(HostEvent::TrayOpenManager),
+            TRAY_PAUSE => Some(HostEvent::TrayTogglePause),
+            TRAY_QUIT => Some(HostEvent::TrayQuit),
+            _ => None,
+        }
+    }
+}
+
 /// The Windows desktop host. Must be used from one thread, which also pumps
 /// its messages.
 #[derive(Debug)]
@@ -122,6 +189,7 @@ pub struct WindowsHost {
     message_window: HWND,
     windows: BTreeMap<MonitorId, (HWND, Rect)>,
     monitor_handles: BTreeMap<MonitorId, isize>,
+    tray: bool,
 }
 
 impl WindowsHost {
@@ -182,6 +250,7 @@ impl WindowsHost {
             message_window,
             windows: BTreeMap::new(),
             monitor_handles: BTreeMap::new(),
+            tray: false,
         })
     }
 
@@ -549,6 +618,45 @@ impl DesktopHost for WindowsHost {
         Some((p.x, p.y))
     }
 
+    fn waker(&self) -> Waker {
+        let hwnd = self.message_window.0 as isize;
+        Waker::new(move || {
+            // SAFETY: PostMessageW is thread-safe; if the window is gone the
+            // call fails harmlessly.
+            let _ =
+                unsafe { PostMessageW(Some(HWND(hwnd as *mut _)), WM_WAKE, WPARAM(0), LPARAM(0)) };
+        })
+    }
+
+    fn set_tray(&mut self, paused: bool) {
+        TRAY_PAUSED.with(|p| p.set(paused));
+        let mut data = NOTIFYICONDATAW {
+            cbSize: std::mem::size_of::<NOTIFYICONDATAW>() as u32,
+            hWnd: self.message_window,
+            uID: 1,
+            uFlags: NIF_MESSAGE | NIF_ICON | NIF_TIP,
+            uCallbackMessage: WM_TRAY,
+            ..Default::default()
+        };
+        // SAFETY: loading a stock icon has no preconditions.
+        if let Ok(icon) = unsafe { LoadIconW(None, IDI_APPLICATION) } {
+            data.hIcon = icon;
+        }
+        let tip: Vec<u16> = if paused {
+            "Wallweaver (paused)"
+        } else {
+            "Wallweaver"
+        }
+        .encode_utf16()
+        .collect();
+        data.szTip[..tip.len()].copy_from_slice(&tip);
+        let op = if self.tray { NIM_MODIFY } else { NIM_ADD };
+        // SAFETY: data is fully initialized and outlives the call.
+        if unsafe { Shell_NotifyIconW(op, &data) }.as_bool() {
+            self.tray = true;
+        }
+    }
+
     fn pump(&mut self, timeout: Duration) -> Vec<HostEvent> {
         let deadline = Instant::now() + timeout;
         loop {
@@ -580,6 +688,16 @@ impl Drop for WindowsHost {
         let ids: Vec<_> = self.windows.keys().copied().collect();
         for id in ids {
             self.destroy_window(id);
+        }
+        if self.tray {
+            let data = NOTIFYICONDATAW {
+                cbSize: std::mem::size_of::<NOTIFYICONDATAW>() as u32,
+                hWnd: self.message_window,
+                uID: 1,
+                ..Default::default()
+            };
+            // SAFETY: removes the icon this host added.
+            let _ = unsafe { Shell_NotifyIconW(NIM_DELETE, &data) };
         }
         // SAFETY: created by this host.
         let _ = unsafe { DestroyWindow(self.message_window) };

@@ -16,6 +16,7 @@
 pub mod geometry;
 pub mod macos;
 pub mod power;
+pub mod process;
 pub mod wayland;
 
 #[cfg(windows)]
@@ -76,9 +77,40 @@ pub struct HostWindow {
     pub height: u32,
 }
 
+/// Wakes a host's [`DesktopHost::pump`] from another thread, so the daemon
+/// can sleep in the window-system wait and still react to IPC at once.
+#[derive(Clone)]
+pub struct Waker(std::sync::Arc<dyn Fn() + Send + Sync>);
+
+impl Waker {
+    /// Wrap a wake function.
+    pub fn new(f: impl Fn() + Send + Sync + 'static) -> Waker {
+        Waker(std::sync::Arc::new(f))
+    }
+
+    /// Wake the pump.
+    pub fn wake(&self) {
+        (self.0)()
+    }
+}
+
+impl std::fmt::Debug for Waker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Waker")
+    }
+}
+
 /// Something that happened in the window system.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HostEvent {
+    /// Woken through a [`Waker`].
+    Woken,
+    /// Tray menu: open the manager window.
+    TrayOpenManager,
+    /// Tray menu: pause or resume all wallpapers.
+    TrayTogglePause,
+    /// Tray menu: quit.
+    TrayQuit,
     /// Monitors were added, removed, moved or resized.
     MonitorsChanged,
     /// The desktop shell restarted (for example Explorer crashed); windows
@@ -119,6 +151,14 @@ pub trait DesktopHost {
 
     /// Handle pending window-system messages, waiting at most `timeout`.
     fn pump(&mut self, timeout: Duration) -> Vec<HostEvent>;
+
+    /// A handle that interrupts [`DesktopHost::pump`] from any thread.
+    fn waker(&self) -> Waker;
+
+    /// Show the tray icon, or update its menu to reflect the pause state.
+    /// Hosts without a tray ignore this; the manager window has the same
+    /// controls.
+    fn set_tray(&mut self, _paused: bool) {}
 }
 
 /// The host for the current platform and session.
@@ -157,6 +197,7 @@ pub fn platform_host() -> Result<Box<dyn DesktopHost>, DesktopError> {
 #[derive(Debug, Clone)]
 pub struct NullHost {
     monitor: Monitor,
+    wake: std::sync::Arc<(std::sync::Mutex<bool>, std::sync::Condvar)>,
 }
 
 impl NullHost {
@@ -169,6 +210,7 @@ impl NullHost {
                 rect: Rect::new(0, 0, width, height),
                 primary: true,
             },
+            wake: Default::default(),
         }
     }
 }
@@ -206,8 +248,30 @@ impl DesktopHost for NullHost {
     }
 
     fn pump(&mut self, timeout: Duration) -> Vec<HostEvent> {
-        std::thread::sleep(timeout);
-        Vec::new()
+        let (lock, cv) = &*self.wake;
+        let Ok(guard) = lock.lock() else {
+            return Vec::new();
+        };
+        let Ok((mut woken, _)) = cv.wait_timeout_while(guard, timeout, |w| !*w) else {
+            return Vec::new();
+        };
+        if *woken {
+            *woken = false;
+            vec![HostEvent::Woken]
+        } else {
+            Vec::new()
+        }
+    }
+
+    fn waker(&self) -> Waker {
+        let wake = self.wake.clone();
+        Waker::new(move || {
+            let (lock, cv) = &*wake;
+            if let Ok(mut w) = lock.lock() {
+                *w = true;
+                cv.notify_one();
+            }
+        })
     }
 }
 
@@ -225,6 +289,22 @@ mod tests {
         let s = h.signals(&mons);
         assert!(s.monitors.contains_key(&0));
         assert!(!s.on_battery);
+    }
+
+    #[test]
+    fn null_host_wakes_from_another_thread() {
+        let mut h = NullHost::new(8, 8);
+        let w = h.waker();
+        let t = std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(50));
+            w.wake();
+        });
+        let start = std::time::Instant::now();
+        let ev = h.pump(Duration::from_secs(10));
+        assert_eq!(ev, vec![HostEvent::Woken]);
+        assert!(start.elapsed() < Duration::from_secs(5));
+        t.join().unwrap();
+        assert!(h.pump(Duration::from_millis(10)).is_empty());
     }
 
     #[test]

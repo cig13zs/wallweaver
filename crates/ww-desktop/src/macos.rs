@@ -50,4 +50,7 @@ impl crate::DesktopHost for MacHost {
     fn pump(&mut self, _: std::time::Duration) -> Vec<crate::HostEvent> {
         match *self {}
     }
+    fn waker(&self) -> crate::Waker {
+        match *self {}
+    }
 }
