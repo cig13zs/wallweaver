@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 9c4f3833fc9e548729286a099de8a9fc9295af8965a44abb499fa9e0209aea89 # shrinks to policy = Policy { max_fps: 1, throttled_fps: 1, fullscreen: Run, fullscreen_scope: SameMonitor, covered: Run, covered_threshold: 0.95, on_battery: Run, low_battery_percent: 20, battery_saver: Pause, app_rules: [], resume_delay: 0ns, stop_after: Some(0ns) }, steps = [(0, Signals { user_paused: true, user_stopped: false, session_locked: false, displays_off: false, on_battery: false, battery_percent: None, battery_saver: false, monitors: {2: MonitorSignals { fullscreen_app: false, covered_fraction: 0.0, foreground_app: None }} }), (1, Signals { user_paused: false, user_stopped: false, session_locked: true, displays_off: false, on_battery: false, battery_percent: None, battery_saver: false, monitors: {2: MonitorSignals { fullscreen_app: false, covered_fraction: 0.0, foreground_app: None }} })]
