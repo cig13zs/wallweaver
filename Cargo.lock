@@ -2041,6 +2041,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
 
 [[package]]
+name = "ww-bench"
+version = "0.1.0-alpha.1"
+dependencies = [
+ "image",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "ww-desktop",
+ "ww-ipc",
+ "ww-manifest",
+ "ww-render",
+]
+
+[[package]]
+name = "ww-daemon"
+version = "0.1.0-alpha.1"
+dependencies = [
+ "serde_json",
+ "tempfile",
+ "ww-desktop",
+ "ww-governor",
+ "ww-ipc",
+ "ww-manifest",
+ "ww-permissions",
+ "ww-render",
+]
+
+[[package]]
 name = "ww-desktop"
 version = "0.1.0-alpha.1"
 dependencies = [

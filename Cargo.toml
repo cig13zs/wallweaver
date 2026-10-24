@@ -48,3 +48,8 @@ strip = "symbols"
 [profile.release-small]
 inherits = "release"
 opt-level = "s"
+
+# Image decoding and shader compilation are painfully slow unoptimized;
+# optimize dependencies even in debug builds so tests run quickly.
+[profile.dev.package."*"]
+opt-level = 2
