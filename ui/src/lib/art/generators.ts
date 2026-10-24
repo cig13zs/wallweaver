@@ -65,6 +65,21 @@ function pixelField(ctx: Ctx, w: number, h: number, dpr: number, scale: number, 
   x.putImageData(id, 0, 0); ctx.imageSmoothingEnabled = true; ctx.drawImage(c, 0, 0, w, h);
 }
 
+// Blur without ctx.filter, which some webviews lack: draw small, then scale up in 2x steps.
+function soft(ctx: Ctx, w: number, h: number, radius: number, draw: (c: Ctx) => void): void {
+  const k = Math.max(1, radius * 0.8);
+  let cw = Math.max(2, Math.round(w / k)), ch = Math.max(2, Math.round(h / k));
+  let src = makeCanvas(); src.width = cw; src.height = ch;
+  const sx = src.getContext("2d")!; sx.scale(cw / w, ch / h); draw(sx);
+  while (cw * 2 < w) {
+    const n = makeCanvas(); n.width = cw * 2; n.height = ch * 2;
+    const nx = n.getContext("2d")!; nx.imageSmoothingEnabled = true; nx.imageSmoothingQuality = "high";
+    nx.drawImage(src, 0, 0, n.width, n.height);
+    src = n; cw *= 2; ch *= 2;
+  }
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; ctx.drawImage(src, 0, 0, w, h);
+}
+
 // ---------- generators ----------
 const G: Record<string, Gen> = {};
 
@@ -236,10 +251,11 @@ G.waves = (ctx, w, h, R, o) => {
 
 G.mesh = (ctx, w, h, R, o) => {
   const pal = o.pal || ["#ffd1c2", "#d6c4ff", "#a8ecdf", "#ffe7a8", "#f7b8d9"];
-  ctx.fillStyle = "#f3ecfb"; ctx.fillRect(0, 0, w, h);
-  ctx.filter = `blur(${Math.round(Math.min(w, h) * 0.12)}px)`;
-  for (let i = 0; i < 7; i++) { ctx.fillStyle = pal[i % pal.length]; ctx.beginPath(); ctx.ellipse(R() * w, R() * h, w * (0.18 + R() * 0.22), h * (0.25 + R() * 0.3), R() * 3, 0, 7); ctx.fill(); }
-  ctx.filter = "none"; grain(ctx, w, h, R, 0.07);
+  soft(ctx, w, h, Math.min(w, h) * 0.12, (c) => {
+    c.fillStyle = "#f3ecfb"; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 7; i++) { c.fillStyle = pal[i % pal.length]; c.beginPath(); c.ellipse(R() * w, R() * h, w * (0.18 + R() * 0.22), h * (0.25 + R() * 0.3), R() * 3, 0, 7); c.fill(); }
+  });
+  grain(ctx, w, h, R, 0.07);
 };
 
 G.plasma = (ctx, w, h, R, o, dpr) => {

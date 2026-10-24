@@ -27,7 +27,7 @@ input, select, textarea { font: inherit; color: inherit; }
 button:disabled { cursor: default; opacity: 0.55; }
 svg.ic { display: block; flex: none; }
 
-/* Interactive elements built on the mockup classes */
+/* Hover and focus states for the shared component classes */
 .nav-item, .chip, .btn, .icon-btn, .seg > *, .tabs > *, .select { transition: background-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s; }
 .nav-item:hover { color: var(--ink); background: var(--panel); }
 .chip:hover:not(.active) { color: var(--ink); background: var(--panel-2); }

@@ -57,7 +57,7 @@ export function displayList(ids: number[]): string {
   return `displays ${sorted.slice(0, -1).join(", ")} and ${last}`;
 }
 
-/** Slider readout as the mockups show it: speed "0.6×", fractions as "70%". */
+/** Slider readout: multipliers as "0.6×", fractions as "70%". */
 export function formatSliderValue(value: number, unit: "x" | "%"): string {
   if (unit === "%") return `${Math.round(value * 100)}%`;
   return `${trim1(value)}×`;

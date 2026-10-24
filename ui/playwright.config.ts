@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 // Smoke tests run against the production build (vite preview), in browser mode with the mock daemon.
 export default defineConfig({
@@ -8,13 +8,12 @@ export default defineConfig({
   workers: 1,
   reporter: [["list"]],
   use: {
+    browserName: "chromium",
     baseURL: "http://localhost:4173",
     viewport: { width: 1440, height: 900 },
-    colorScheme: "dark",
-    ...devices["Desktop Chrome"],
     deviceScaleFactor: 1,
+    colorScheme: "dark",
   },
-  projects: [{ name: "chromium", use: { browserName: "chromium", viewport: { width: 1440, height: 900 } } }],
   webServer: {
     command: "pnpm exec vite preview --port 4173 --strictPort",
     url: "http://localhost:4173",
