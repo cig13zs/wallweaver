@@ -33,6 +33,13 @@ todo = "warn"
 unwrap_used = "warn"
 
 [profile.release]
-lto = "thin"
+opt-level = 3
+lto = "fat"
 codegen-units = 1
+panic = "abort"
 strip = "symbols"
+
+# Smallest binaries, for size comparisons: cargo build --profile release-small
+[profile.release-small]
+inherits = "release"
+opt-level = "s"

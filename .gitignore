@@ -15,3 +15,4 @@ Thumbs.db
 /crates/ww-package/fuzz/coverage
 .env
 .env.*
+/crates/ww-package/fuzz/Cargo.lock
