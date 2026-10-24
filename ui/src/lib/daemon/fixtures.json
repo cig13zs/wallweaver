@@ -1,0 +1,1139 @@
+{
+ "status": {
+  "version": "0.1",
+  "displaysLive": 2,
+  "displaysTotal": 3,
+  "cpuPct": 1.9,
+  "paused": false,
+  "libraryCount": 48,
+  "playlistCount": 5,
+  "nowPlaying": {
+   "id": "aurora-loom",
+   "title": "Aurora Loom",
+   "art": {
+    "kind": "aurora",
+    "seed": 4
+   },
+   "displays": 2
+  }
+ },
+ "featured": {
+  "hero": [
+   {
+    "id": "aurora-loom",
+    "blurb": "Slow northern-light curtains over a quiet ridge. Reacts gently to music, dims itself at night, and costs almost nothing to run."
+   },
+   {
+    "id": "spectrum-bloom",
+    "blurb": "Soft bars that rise with whatever is playing. Reads audio levels only, never a recording."
+   },
+   {
+    "id": "morning-ridge",
+    "blurb": "Layered hills under a slow sunrise. A looped video that pauses itself the moment you go fullscreen."
+   },
+   {
+    "id": "deep-field",
+    "blurb": "Drifting gas clouds and pinpoint stars, rendered once and cached while nothing moves."
+   },
+   {
+    "id": "contour",
+    "blurb": "Topographic lines that lean toward your pointer. Light enough to leave on all day."
+   }
+  ],
+  "side": [
+   {
+    "id": "saturn-hours",
+    "badge": "Staff pick",
+    "art": {
+     "kind": "planet",
+     "seed": 9
+    }
+   },
+   {
+    "id": "petal-drift",
+    "badge": "New",
+    "art": {
+     "kind": "sakura",
+     "seed": 3
+    }
+   }
+  ]
+ },
+ "gallery": [
+  {
+   "id": "neon-rainfall",
+   "title": "Neon Rainfall",
+   "author": "kurogane",
+   "kind": "web",
+   "category": "cyberpunk",
+   "cost": "med",
+   "gpuPct": 3.1,
+   "uses": [
+    "audio"
+   ],
+   "likes": 12400,
+   "installed": false,
+   "art": {
+    "kind": "cyber",
+    "seed": 2
+   }
+  },
+  {
+   "id": "low-tide-moon",
+   "title": "Low Tide Moon",
+   "author": "mira",
+   "kind": "shader",
+   "category": "nature",
+   "cost": "low",
+   "gpuPct": 1.2,
+   "uses": [],
+   "likes": 9800,
+   "installed": true,
+   "art": {
+    "kind": "ocean",
+    "seed": 5
+   }
+  },
+  {
+   "id": "spectrum-bloom",
+   "title": "Spectrum Bloom",
+   "author": "wavelet",
+   "kind": "web",
+   "category": "minimal",
+   "cost": "low",
+   "gpuPct": 2.0,
+   "uses": [
+    "audio"
+   ],
+   "likes": 21000,
+   "installed": false,
+   "art": {
+    "kind": "bars",
+    "seed": 1
+   }
+  },
+  {
+   "id": "night-drive-84",
+   "title": "Night Drive ’84",
+   "author": "vhs.dreams",
+   "kind": "shader",
+   "category": "cyberpunk",
+   "cost": "med",
+   "gpuPct": 4.2,
+   "uses": [
+    "audio"
+   ],
+   "likes": 15200,
+   "installed": false,
+   "art": {
+    "kind": "synthwave",
+    "seed": 7
+   }
+  },
+  {
+   "id": "contour",
+   "title": "Contour",
+   "author": "fieldnotes",
+   "kind": "shader",
+   "category": "minimal",
+   "cost": "low",
+   "gpuPct": 1.4,
+   "uses": [
+    "mouse"
+   ],
+   "likes": 4100,
+   "installed": false,
+   "art": {
+    "kind": "topo",
+    "seed": 11
+   }
+  },
+  {
+   "id": "pastel-haze",
+   "title": "Pastel Haze",
+   "author": "soft.systems",
+   "kind": "web",
+   "category": "minimal",
+   "cost": "low",
+   "gpuPct": 0.8,
+   "uses": [],
+   "likes": 7700,
+   "installed": false,
+   "art": {
+    "kind": "mesh",
+    "seed": 6
+   }
+  },
+  {
+   "id": "8-bit-dusk",
+   "title": "8-bit Dusk",
+   "author": "pxl.club",
+   "kind": "video",
+   "category": "pixel",
+   "cost": "low",
+   "gpuPct": 1.1,
+   "uses": [],
+   "likes": 18900,
+   "installed": true,
+   "art": {
+    "kind": "pixelcity",
+    "seed": 8
+   }
+  },
+  {
+   "id": "constellation",
+   "title": "Constellation",
+   "author": "nodeworks",
+   "kind": "web",
+   "category": "space",
+   "cost": "med",
+   "gpuPct": 3.6,
+   "uses": [
+    "mouse"
+   ],
+   "likes": 6300,
+   "installed": false,
+   "art": {
+    "kind": "particles",
+    "seed": 10
+   }
+  },
+  {
+   "id": "prism-fold",
+   "title": "Prism Fold",
+   "author": "facet",
+   "kind": "web",
+   "category": "minimal",
+   "cost": "low",
+   "gpuPct": 0.9,
+   "uses": [],
+   "likes": 3200,
+   "installed": false,
+   "art": {
+    "kind": "lowpoly",
+    "seed": 12
+   }
+  },
+  {
+   "id": "plasma-garden",
+   "title": "Plasma Garden",
+   "author": "shaderkid",
+   "kind": "shader",
+   "category": "minimal",
+   "cost": "high",
+   "gpuPct": 9.5,
+   "uses": [
+    "audio"
+   ],
+   "likes": 5600,
+   "installed": false,
+   "art": {
+    "kind": "plasma",
+    "seed": 13
+   }
+  },
+  {
+   "id": "morning-ridge",
+   "title": "Morning Ridge",
+   "author": "lumen",
+   "kind": "video",
+   "category": "nature",
+   "cost": "low",
+   "gpuPct": 1.0,
+   "uses": [],
+   "likes": 11100,
+   "installed": false,
+   "art": {
+    "kind": "mountains",
+    "seed": 14
+   }
+  },
+  {
+   "id": "deep-field",
+   "title": "Deep Field",
+   "author": "astro.ink",
+   "kind": "video",
+   "category": "space",
+   "cost": "med",
+   "gpuPct": 3.3,
+   "uses": [],
+   "likes": 8000,
+   "installed": false,
+   "art": {
+    "kind": "nebula",
+    "seed": 15
+   }
+  },
+  {
+   "id": "silk-lines",
+   "title": "Silk Lines",
+   "author": "mono.wave",
+   "kind": "web",
+   "category": "minimal",
+   "cost": "low",
+   "gpuPct": 0.4,
+   "uses": [
+    "audio"
+   ],
+   "likes": 2900,
+   "installed": true,
+   "art": {
+    "kind": "waves",
+    "seed": 16
+   }
+  },
+  {
+   "id": "saturn-hours",
+   "title": "Saturn Hours",
+   "author": "orbitals",
+   "kind": "web",
+   "category": "space",
+   "cost": "med",
+   "gpuPct": 3.8,
+   "uses": [],
+   "likes": 13700,
+   "installed": false,
+   "art": {
+    "kind": "planet",
+    "seed": 3
+   }
+  },
+  {
+   "id": "petal-drift",
+   "title": "Petal Drift",
+   "author": "hanami.studio",
+   "kind": "video",
+   "category": "anime",
+   "cost": "low",
+   "gpuPct": 1.3,
+   "uses": [],
+   "likes": 24000,
+   "installed": false,
+   "art": {
+    "kind": "sakura",
+    "seed": 21
+   }
+  },
+  {
+   "id": "weather-glass",
+   "title": "Weather Glass",
+   "author": "nimbus.lab",
+   "kind": "web",
+   "category": "nature",
+   "cost": "low",
+   "gpuPct": 1.6,
+   "uses": [
+    "mouse"
+   ],
+   "likes": 5100,
+   "installed": false,
+   "art": {
+    "kind": "mountains",
+    "seed": 52
+   }
+  }
+ ],
+ "details": [
+  {
+   "id": "aurora-loom",
+   "title": "Aurora Loom",
+   "author": "mira",
+   "kind": "shader",
+   "category": "nature",
+   "cost": "low",
+   "gpuPct": 2.0,
+   "uses": [
+    "audio"
+   ],
+   "likes": 32000,
+   "installed": true,
+   "art": {
+    "kind": "aurora",
+    "seed": 4
+   },
+   "description": "Slow northern-light curtains over a quiet ridge. Gently follows your music and dims after sunset.",
+   "version": "1.2.0",
+   "license": "MIT",
+   "remixAllowed": true,
+   "signed": true,
+   "sizeBytes": 1887437,
+   "updated": "2026-10-18",
+   "watts": 0.4,
+   "usesLabel": "Audio levels only",
+   "presets": 3,
+   "creator": {
+    "handle": "mira",
+    "initials": "MI",
+    "wallpapers": 14,
+    "installs": 32000,
+    "since": 2026,
+    "verified": true
+   },
+   "palettes": [
+    {
+     "id": "borealis",
+     "css": "linear-gradient(90deg,#5effc4,#3aa7ff 50%,#9a8cff)",
+     "colors": [
+      "#5EFFC4",
+      "#9A8CFF"
+     ]
+    },
+    {
+     "id": "blush",
+     "css": "linear-gradient(90deg,#ffb7a8,#ff8fd2 50%,#c6a8ff)",
+     "colors": [
+      "#FFB7A8",
+      "#C6A8FF"
+     ]
+    },
+    {
+     "id": "ember",
+     "css": "linear-gradient(90deg,#f5c56e,#ff8b7e 50%,#b06bff)",
+     "colors": [
+      "#F5C56E",
+      "#B06BFF"
+     ]
+    },
+    {
+     "id": "mono",
+     "css": "linear-gradient(90deg,#e8e6f2,#9a98ad 50%,#4b4960)",
+     "colors": [
+      "#E8E6F2",
+      "#4B4960"
+     ]
+    },
+    {
+     "id": "spectrum",
+     "css": "conic-gradient(from 90deg,#ff8b7e,#f5c56e,#6fe3b4,#86c5ff,#a596ff,#ff8b7e)",
+     "colors": [
+      "#6FE3B4",
+      "#A596FF"
+     ]
+    }
+   ],
+   "paletteId": "borealis",
+   "properties": [
+    {
+     "key": "glow",
+     "label": "Glow",
+     "type": "color",
+     "value": "#5EFFC4"
+    },
+    {
+     "key": "fade",
+     "label": "Fade",
+     "type": "color",
+     "value": "#9A8CFF"
+    },
+    {
+     "key": "speed",
+     "label": "Speed",
+     "type": "slider",
+     "min": 0.1,
+     "max": 3,
+     "step": 0.1,
+     "value": 0.6,
+     "unit": "x"
+    },
+    {
+     "key": "stars",
+     "label": "Stars",
+     "type": "slider",
+     "min": 0,
+     "max": 1,
+     "step": 0.01,
+     "value": 0.7,
+     "unit": "%"
+    },
+    {
+     "key": "foreground",
+     "label": "Foreground",
+     "type": "combo",
+     "value": "ridgeLow",
+     "options": [
+      {
+       "value": "ridgeLow",
+       "label": "Ridge, low"
+      },
+      {
+       "value": "ridgeHigh",
+       "label": "Ridge, high"
+      },
+      {
+       "value": "none",
+       "label": "No foreground"
+      }
+     ]
+    },
+    {
+     "key": "reactToMusic",
+     "label": "React to music",
+     "type": "bool",
+     "value": true,
+     "icon": "audio",
+     "needs": "Audio levels"
+    },
+    {
+     "key": "mouseParallax",
+     "label": "Mouse parallax",
+     "type": "bool",
+     "value": false,
+     "icon": "mouse"
+    },
+    {
+     "key": "dimAfterSunset",
+     "label": "Dim after sunset",
+     "type": "bool",
+     "value": true,
+     "icon": "moon"
+    }
+   ],
+   "moreFromCreator": [
+    {
+     "id": "low-tide-moon",
+     "title": "Low Tide Moon",
+     "author": "mira",
+     "kind": "shader",
+     "category": "nature",
+     "cost": "low",
+     "gpuPct": 1.2,
+     "uses": [],
+     "likes": 9800,
+     "installed": true,
+     "art": {
+      "kind": "ocean",
+      "seed": 5
+     }
+    },
+    {
+     "id": "hill-hush",
+     "title": "Hill Hush",
+     "author": "mira",
+     "kind": "video",
+     "category": "nature",
+     "cost": "low",
+     "gpuPct": 1.0,
+     "uses": [],
+     "likes": 4200,
+     "installed": false,
+     "art": {
+      "kind": "mountains",
+      "seed": 31
+     }
+    },
+    {
+     "id": "tide-glass",
+     "title": "Tide Glass",
+     "author": "mira",
+     "kind": "web",
+     "category": "minimal",
+     "cost": "low",
+     "gpuPct": 1.0,
+     "uses": [],
+     "likes": 2100,
+     "installed": false,
+     "art": {
+      "kind": "lowpoly",
+      "seed": 40,
+      "pal": [
+       "#06241f",
+       "#0f5e57",
+       "#2fb5a0",
+       "#a8f0d8",
+       "#f2fff8"
+      ]
+     }
+    },
+    {
+     "id": "far-light",
+     "title": "Far Light",
+     "author": "mira",
+     "kind": "video",
+     "category": "space",
+     "cost": "med",
+     "gpuPct": 3.0,
+     "uses": [],
+     "likes": 3900,
+     "installed": false,
+     "art": {
+      "kind": "nebula",
+      "seed": 44
+     }
+    },
+    {
+     "id": "paper-tide",
+     "title": "Paper Tide",
+     "author": "mira",
+     "kind": "web",
+     "category": "minimal",
+     "cost": "low",
+     "gpuPct": 0.5,
+     "uses": [],
+     "likes": 1800,
+     "installed": false,
+     "art": {
+      "kind": "waves",
+      "seed": 9,
+      "variant": "light"
+     }
+    }
+   ]
+  }
+ ],
+ "displays": [
+  {
+   "id": 1,
+   "label": "Portrait",
+   "width": 1080,
+   "height": 1920,
+   "main": false,
+   "wallpaperId": "silk-lines",
+   "layout": {
+    "x": 20,
+    "y": 10,
+    "w": 48,
+    "h": 84
+   },
+   "art": {
+    "kind": "waves",
+    "seed": 16
+   }
+  },
+  {
+   "id": 2,
+   "label": "main",
+   "width": 2560,
+   "height": 1440,
+   "main": true,
+   "wallpaperId": "aurora-loom",
+   "layout": {
+    "x": 80,
+    "y": 12,
+    "w": 144,
+    "h": 81
+   },
+   "art": {
+    "kind": "aurora",
+    "seed": 4
+   }
+  },
+  {
+   "id": 3,
+   "label": "",
+   "width": 1920,
+   "height": 1080,
+   "main": false,
+   "wallpaperId": "aurora-loom",
+   "layout": {
+    "x": 236,
+    "y": 26,
+    "w": 96,
+    "h": 54
+   },
+   "art": {
+    "kind": "aurora",
+    "seed": 4
+   }
+  }
+ ],
+ "installRequests": [
+  {
+   "wallpaperId": "weather-glass",
+   "title": "Weather Glass",
+   "author": "nimbus.lab",
+   "version": "2.0.1",
+   "kindLabel": "Web wallpaper",
+   "sizeBytes": 4404019,
+   "art": {
+    "kind": "mountains",
+    "seed": 52
+   },
+   "signature": {
+    "signer": "nimbus.lab",
+    "fingerprint": "7F3A…C21E",
+    "unchanged": true,
+    "listed": true
+   },
+   "permissions": [
+    {
+     "key": "audio",
+     "icon": "audio",
+     "title": "See how loud your music is",
+     "detail": "Audio levels only, as 64 bars. Never your microphone, never a recording.",
+     "tech": "audio"
+    },
+    {
+     "key": "network",
+     "icon": "weather",
+     "title": "Read the weather from",
+     "target": "api.forecast.example",
+     "detail": "Only this one address. It gets your city, not your exact location.",
+     "tech": "network: https://api.forecast.example"
+    },
+    {
+     "key": "system.stats",
+     "icon": "cpu",
+     "title": "Read CPU and GPU usage",
+     "detail": "Percentages once a second. It can’t see which apps you run.",
+     "ifDenied": "If denied: the stats ring shows “–” and everything else works.",
+     "tech": "system.stats: cpu, gpu"
+    },
+    {
+     "key": "input.mouse",
+     "icon": "mouse",
+     "title": "Follow your mouse over the desktop",
+     "detail": "Pointer position only, while the desktop is visible. No clicks, no typing.",
+     "tech": "input.mouse"
+    }
+   ],
+   "alwaysBlocked": [
+    {
+     "icon": "folder",
+     "label": "Your files"
+    },
+    {
+     "icon": "mic",
+     "label": "Microphone"
+    },
+    {
+     "icon": "camera",
+     "label": "Camera"
+    },
+    {
+     "icon": "clipboard",
+     "label": "Clipboard"
+    },
+    {
+     "icon": "globe",
+     "label": "Any other website"
+    },
+    {
+     "icon": "window",
+     "label": "Pop-ups and new windows"
+    },
+    {
+     "icon": "terminal",
+     "label": "Running programs"
+    }
+   ]
+  }
+ ],
+ "performance": {
+  "cpu": {
+   "value": 1.9,
+   "systemPct": 23,
+   "history": [
+    14,
+    16,
+    13,
+    18,
+    15,
+    17,
+    14,
+    20,
+    17,
+    19,
+    16,
+    18,
+    17,
+    19
+   ]
+  },
+  "gpu": {
+   "value": 3.4,
+   "adapter": "Discrete GPU",
+   "shaders": 2,
+   "history": [
+    22,
+    20,
+    24,
+    21,
+    23,
+    19,
+    22,
+    24,
+    10,
+    8,
+    9,
+    14,
+    20,
+    21
+   ]
+  },
+  "memory": {
+   "value": 142,
+   "budgetMb": 300,
+   "webviews": 3,
+   "history": [
+    24,
+    24,
+    25,
+    25,
+    24,
+    25,
+    25,
+    25,
+    24,
+    25,
+    25,
+    25,
+    25,
+    25
+   ]
+  },
+  "power": {
+   "value": 0.6,
+   "pluggedIn": true,
+   "batteryPct": 84,
+   "history": [
+    18,
+    19,
+    17,
+    20,
+    18,
+    19,
+    18,
+    21,
+    12,
+    11,
+    12,
+    15,
+    18,
+    18
+   ]
+  },
+  "displays": [
+   {
+    "displayId": 1,
+    "wallpaperTitle": "Silk Lines",
+    "art": {
+     "kind": "waves",
+     "seed": 16
+    },
+    "detail": "1080×1920 portrait · capped at 30 fps",
+    "state": "running",
+    "fps": 30,
+    "gpuPct": 0.4
+   },
+   {
+    "displayId": 2,
+    "wallpaperTitle": "Aurora Loom",
+    "art": {
+     "kind": "aurora",
+     "seed": 4
+    },
+    "detail": "2560×1440 · main display",
+    "state": "running",
+    "fps": 60,
+    "gpuPct": 3.0
+   },
+   {
+    "displayId": 3,
+    "wallpaperTitle": "Aurora Loom",
+    "art": {
+     "kind": "aurora",
+     "seed": 4
+    },
+    "detail": "Paused 4 min ago:",
+    "reason": "a game is fullscreen here",
+    "state": "paused",
+    "fps": 0,
+    "gpuPct": 0.0
+   }
+  ],
+  "checkIntervalMs": 250,
+  "rules": [
+   {
+    "id": "fullscreen",
+    "icon": "maximize",
+    "title": "An app goes fullscreen on the same display",
+    "detail": "Games, video players, presentations",
+    "action": "Pause",
+    "options": [
+     "Keep running",
+     "Lower to 30 fps",
+     "Pause",
+     "Stop, show still"
+    ]
+   },
+   {
+    "id": "covered",
+    "icon": "window",
+    "title": "The desktop is mostly covered",
+    "detail": "95% or more hidden by windows",
+    "action": "Pause",
+    "options": [
+     "Keep running",
+     "Lower to 30 fps",
+     "Pause",
+     "Stop, show still"
+    ]
+   },
+   {
+    "id": "battery",
+    "icon": "battery",
+    "title": "Running on battery",
+    "detail": "Laptop unplugged",
+    "action": "Lower to 30 fps",
+    "options": [
+     "Keep running",
+     "Lower to 30 fps",
+     "Pause",
+     "Stop, show still"
+    ]
+   },
+   {
+    "id": "lowBattery",
+    "icon": "zap",
+    "title": "Battery below 20%",
+    "detail": "Shows a still frame, frees all memory",
+    "action": "Stop, show still",
+    "options": [
+     "Lower to 30 fps",
+     "Pause",
+     "Stop, show still"
+    ]
+   },
+   {
+    "id": "locked",
+    "icon": "lock",
+    "title": "Screen locked or displays asleep",
+    "detail": "Nobody is looking, so nothing renders",
+    "action": "Stop, free memory",
+    "options": [
+     "Pause",
+     "Stop, free memory"
+    ]
+   }
+  ],
+  "appRules": [
+   {
+    "exe": "game.exe",
+    "icon": "gamepad",
+    "action": "Stop"
+   },
+   {
+    "exe": "recorder.exe",
+    "icon": "film",
+    "action": "Keep running"
+   }
+  ],
+  "preset": "balanced",
+  "presets": [
+   {
+    "id": "quality",
+    "icon": "sparkles",
+    "title": "Best quality",
+    "detail": "60 fps everywhere, full effects, never throttle",
+    "recommended": false
+   },
+   {
+    "id": "balanced",
+    "icon": "gauge",
+    "title": "Balanced",
+    "detail": "60 fps plugged in, 30 fps on battery, pause when hidden",
+    "recommended": true
+   },
+   {
+    "id": "saver",
+    "icon": "leaf",
+    "title": "Battery saver",
+    "detail": "30 fps cap, pause on battery when idle 2 min",
+    "recommended": false
+   },
+   {
+    "id": "ultra",
+    "icon": "moon",
+    "title": "Ultra saver",
+    "detail": "Still image on battery, live only when plugged in",
+    "recommended": false
+   }
+  ],
+  "settings": {
+   "fpsCap": 60,
+   "renderScale": 100,
+   "hwDecode": true,
+   "hwDecodeAvailable": true,
+   "awayMinutes": 10,
+   "showCostBadges": true
+  }
+ },
+ "creator": {
+  "name": "aurora-loom",
+  "version": "1.2.0",
+  "hotReload": true,
+  "savedSecondsAgo": 2,
+  "files": [
+   {
+    "name": "wallpaper.json",
+    "icon": "file",
+    "depth": 0,
+    "sizeBytes": 2150
+   },
+   {
+    "name": "index.html",
+    "icon": "code",
+    "depth": 0,
+    "sizeBytes": 820
+   },
+   {
+    "name": "main.js",
+    "icon": "code",
+    "depth": 0,
+    "sizeBytes": 6550,
+    "modified": true
+   },
+   {
+    "name": "shaders",
+    "icon": "folder",
+    "depth": 0
+   },
+   {
+    "name": "aurora.frag",
+    "icon": "sparkles",
+    "depth": 1,
+    "sizeBytes": 3990,
+    "modified": true
+   },
+   {
+    "name": "stars.frag",
+    "icon": "sparkles",
+    "depth": 1,
+    "sizeBytes": 1230
+   },
+   {
+    "name": "assets",
+    "icon": "folder",
+    "depth": 0
+   },
+   {
+    "name": "ridge.svg",
+    "icon": "image",
+    "depth": 1,
+    "sizeBytes": 14336
+   },
+   {
+    "name": "preview.webp",
+    "icon": "image",
+    "depth": 1,
+    "sizeBytes": 217088
+   },
+   {
+    "name": "LICENSE",
+    "icon": "file",
+    "depth": 0,
+    "sizeBytes": 1126
+   },
+   {
+    "name": "README.md",
+    "icon": "file",
+    "depth": 0,
+    "sizeBytes": 1638
+   }
+  ],
+  "fileCount": 14,
+  "totalBytes": 1887437,
+  "limitBytes": 52428800,
+  "art": {
+   "kind": "aurora",
+   "seed": 4
+  },
+  "properties": [
+   {
+    "key": "speed",
+    "label": "Speed",
+    "type": "slider",
+    "min": 0.1,
+    "max": 3,
+    "step": 0.1,
+    "value": 0.6,
+    "unit": "x"
+   },
+   {
+    "key": "glow",
+    "label": "Glow",
+    "type": "color",
+    "value": "#5EFFC4"
+   },
+   {
+    "key": "stars",
+    "label": "Stars",
+    "type": "slider",
+    "min": 0,
+    "max": 1,
+    "step": 0.01,
+    "value": 0.7,
+    "unit": "%"
+   },
+   {
+    "key": "reactToMusic",
+    "label": "React to music",
+    "type": "bool",
+    "value": true,
+    "icon": "audio",
+    "needs": "audio"
+   },
+   {
+    "key": "foreground",
+    "label": "Foreground",
+    "type": "combo",
+    "value": "ridgeLow",
+    "options": [
+     {
+      "value": "ridgeLow",
+      "label": "Ridge, low"
+     },
+     {
+      "value": "ridgeHigh",
+      "label": "Ridge, high"
+     },
+     {
+      "value": "none",
+      "label": "No foreground"
+     }
+    ]
+   }
+  ],
+  "declared": [
+   "audio"
+  ],
+  "issues": [
+   {
+    "file": "main.js",
+    "line": 88,
+    "call": "fetch(\"https://api.forecast.example/…\")",
+    "missing": "network",
+    "origin": "https://api.forecast.example"
+   }
+  ],
+  "signer": {
+   "name": "mira",
+   "fingerprint": "7F3A…C21E",
+   "store": "OS keychain"
+  },
+  "releaseNote": "Night dimming"
+ },
+ "settings": {
+  "theme": "dark",
+  "motion": "system",
+  "startWithSystem": true,
+  "trayIcon": true,
+  "pauseHotkey": "Ctrl Alt P",
+  "checkGalleryUpdates": true,
+  "developerMode": false,
+  "gallerySources": [
+   "Official gallery"
+  ]
+ },
+ "funding": {
+  "month": "October",
+  "raised": 412,
+  "target": 600,
+  "supporters": 86,
+  "covers": [
+   "signing certificate",
+   "macOS test machine",
+   "2 artist commissions"
+  ]
+ }
+}
