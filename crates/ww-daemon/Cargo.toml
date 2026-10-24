@@ -1,0 +1,28 @@
+[package]
+name = "ww-daemon"
+description = "The always-running Wallweaver process: desktop hosts, governor, renderer and tray"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "ww-daemon"
+path = "src/main.rs"
+
+[dependencies]
+ww-desktop.workspace = true
+ww-governor.workspace = true
+ww-ipc.workspace = true
+ww-manifest.workspace = true
+ww-permissions.workspace = true
+ww-render.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true
