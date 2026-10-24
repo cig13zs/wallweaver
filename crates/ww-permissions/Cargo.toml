@@ -1,0 +1,22 @@
+[package]
+name = "ww-permissions"
+description = "Default-deny permission model for Wallweaver: grants, consent text, CSP and network allowlist"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+ww-manifest.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+url = "2"
+
+[dev-dependencies]
+serde_json.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

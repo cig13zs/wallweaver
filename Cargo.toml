@@ -19,9 +19,14 @@ ww-permissions = { path = "crates/ww-permissions", version = "0.1.0-alpha.1" }
 ww-governor = { path = "crates/ww-governor", version = "0.1.0-alpha.1" }
 ww-desktop = { path = "crates/ww-desktop", version = "0.1.0-alpha.1" }
 
+ww-ipc = { path = "crates/ww-ipc", version = "0.1.0-alpha.1" }
+ww-render = { path = "crates/ww-render", version = "0.1.0-alpha.1" }
+ww-bench = { path = "crates/ww-bench", version = "0.1.0-alpha.1" }
+
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
+proptest = { version = "1", default-features = false, features = ["std"] }
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"
