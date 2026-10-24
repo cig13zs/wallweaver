@@ -1,0 +1,72 @@
+/* Fonts are bundled with the app (latin subset only); nothing is fetched at runtime. */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2") format("woff2");
+}
+
+#app { width: 100%; height: 100%; }
+a { color: inherit; text-decoration: none; }
+input, select, textarea { font: inherit; color: inherit; }
+button:disabled { cursor: default; opacity: 0.55; }
+svg.ic { display: block; flex: none; }
+
+/* Interactive elements built on the mockup classes */
+.nav-item, .chip, .btn, .icon-btn, .seg > *, .tabs > *, .select { transition: background-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s; }
+.nav-item:hover { color: var(--ink); background: var(--panel); }
+.chip:hover:not(.active) { color: var(--ink); background: var(--panel-2); }
+.btn-primary:hover { background: var(--accent-strong); }
+.btn-secondary:hover, .icon-btn.boxed:hover { background: var(--panel-3); }
+.btn-ghost:hover, .icon-btn:hover { color: var(--ink); background: var(--panel); }
+.btn-glass:hover { background: rgba(255, 255, 255, 0.22); }
+.tabs > button { background: none; }
+.tabs > button:hover { color: var(--ink-2); }
+.seg > button:hover:not(.on) { color: var(--ink); }
+
+/* Native select dressed as .select */
+select.select { appearance: none; cursor: pointer; border: 0; padding-right: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d7a8f' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; background-color: var(--panel-2); }
+select.select option { background: var(--bg-elev); color: var(--ink); }
+
+/* Focus: always visible for keyboard users, never for mouse clicks */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+.chip:focus-visible, .badge:focus-visible, .toggle:focus-visible { border-radius: 99px; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Scrollbars that stay out of the way */
+* { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+
+/* Toggle as a real switch button */
+button.toggle { cursor: pointer; transition: background-color 0.15s; }
+button.toggle::after { transition: left 0.15s; }
+
+/* Reduced motion: honour the OS setting, or the in-app override on <html data-motion> */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) *, :root:not([data-motion="full"]) *::before, :root:not([data-motion="full"]) *::after {
+    animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+  }
+}
+:root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
