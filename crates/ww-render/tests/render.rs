@@ -263,8 +263,14 @@ fn golden_plasma() {
     }
     let want = image::open(&path).unwrap().into_rgba8();
     assert_eq!(want.dimensions(), out.dimensions());
-    // Different GPUs round transcendental functions differently; allow a
-    // small per-channel difference.
+    // The golden image was made on llvmpipe. Other GPUs round
+    // transcendental functions differently, so they get a looser bound that
+    // still catches real breakage (wrong orientation, wrong time, garbage).
+    let limit = if gpu.adapter().name.contains("llvmpipe") {
+        6
+    } else {
+        40
+    };
     let worst = want
         .pixels()
         .zip(out.pixels())
@@ -276,7 +282,10 @@ fn golden_plasma() {
         })
         .max()
         .unwrap_or(0);
-    assert!(worst <= 6, "golden image differs by up to {worst}");
+    assert!(
+        worst <= limit,
+        "golden image differs by up to {worst} (limit {limit})"
+    );
 }
 
 fn write_gif(path: &Path, colors: &[[u8; 4]], delay_ms: u32, size: u32) {
