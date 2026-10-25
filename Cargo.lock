@@ -4801,6 +4801,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "wallweaver"
+version = "0.1.0-alpha.1"
+dependencies = [
+ "serde_json",
+ "tempfile",
+ "ww-bench",
+ "ww-ipc",
+ "ww-manifest",
+ "ww-package",
+ "ww-render",
+]
+
+[[package]]
 name = "wallweaver-manager"
 version = "0.1.0-alpha.1"
 dependencies = [
@@ -5650,6 +5663,7 @@ version = "0.1.0-alpha.1"
 dependencies = [
  "bytemuck",
  "image",
+ "libc",
  "naga",
  "pollster",
  "raw-window-handle",
