@@ -64,6 +64,14 @@ jobs:
           tool: cargo-fuzz
       - name: Fuzz unpack and checksums for 2 minutes each
         working-directory: crates/ww-package
+        shell: bash
         run: |
-          cargo fuzz run unpack -- -max_total_time=120
-          cargo fuzz run checksums -- -max_total_time=120
+          set -o pipefail
+          for target in unpack checksums; do
+            if ! cargo +nightly fuzz run "$target" -- -max_total_time=120 2>&1 | tee "fuzz-$target.log"; then
+              # Surface the end of the output as annotations so a failure is
+              # readable from the run summary.
+              tail -n 15 "fuzz-$target.log" | while IFS= read -r line; do echo "::error title=fuzz $target::$line"; done
+              exit 1
+            fi
+          done
