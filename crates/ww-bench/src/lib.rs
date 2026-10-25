@@ -81,8 +81,11 @@ pub struct CaseResult {
     pub animation_mode: Option<String>,
     /// Running seconds measured.
     pub seconds: f64,
-    /// Frames drawn while running.
+    /// Frames drawn during the measured run (after a half-second warm-up).
     pub frames: u64,
+    /// Frames drawn since the wallpaper was loaded, warm-up included. A
+    /// still image shows 1 here and 0 in `frames`.
+    pub frames_total: u64,
     /// Average frames per second while running.
     pub fps: f64,
     /// Process CPU while running, percent of one core.
@@ -259,6 +262,7 @@ pub fn run(config: &BenchConfig, mut progress: impl FnMut(&str)) -> Result<Repor
             animation_mode: slot.animation_mode.map(str::to_string),
             seconds: wall,
             frames,
+            frames_total: slot.frames.frames,
             fps: frames as f64 / wall,
             cpu_percent: cpu_running,
             paused_cpu_percent: paused_cpu,
@@ -487,7 +491,7 @@ pub fn to_markdown(r: &Report) -> String {
         r.resolution,
         r.fps_cap
     ));
-    out.push_str("| Case | Backend | Frames | Avg fps | CPU % running | CPU % paused | Frames while paused | RSS before (MiB) | RSS peak (MiB) | RSS after stop (MiB) | GPU ms/frame | Textures (MiB) |\n");
+    out.push_str("| Case | Backend | Frames (total) | Avg fps | CPU % running | CPU % paused | Frames while paused | RSS before (MiB) | RSS peak (MiB) | RSS after stop (MiB) | GPU ms/frame | Textures (MiB) |\n");
     out.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
     for c in &r.results {
         let backend = match &c.animation_mode {
@@ -495,10 +499,11 @@ pub fn to_markdown(r: &Report) -> String {
             None => c.backend.clone(),
         };
         out.push_str(&format!(
-            "| {} | {} | {} | {:.1} | {:.1} | {:.2} | {} | {:.1} | {:.1} | {:.1} | {} | {:.1} |\n",
+            "| {} | {} | {} ({}) | {:.1} | {:.1} | {:.2} | {} | {:.1} | {:.1} | {:.1} | {} | {:.1} |\n",
             c.name,
             backend,
             c.frames,
+            c.frames_total,
             c.fps,
             c.cpu_percent,
             c.paused_cpu_percent,
@@ -555,6 +560,7 @@ mod tests {
                 animation_mode: None,
                 seconds: 1.0,
                 frames: 30,
+                frames_total: 31,
                 fps: 30.0,
                 cpu_percent: 5.0,
                 paused_cpu_percent: 0.0,
@@ -569,7 +575,7 @@ mod tests {
             daemon: None,
         };
         let md = to_markdown(&r);
-        assert!(md.contains("| x | shader | 30 |"), "{md}");
+        assert!(md.contains("| x | shader | 30 (31) |"), "{md}");
         assert!(md.contains("software"));
         assert!(serde_json::to_string(&r).unwrap().contains("\"fps\":30.0"));
     }
