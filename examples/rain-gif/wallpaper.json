@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json",
+  "manifestVersion": 1,
+  "id": "examples.rain",
+  "name": "Night Rain",
+  "version": "1.0.0",
+  "type": "animated",
+  "entry": "rain.gif",
+  "author": { "name": "Wallweaver contributors" },
+  "license": "CC0-1.0",
+  "description": "A small looping GIF of rain at night. Kept on the GPU as a texture array, so playback costs no uploads.",
+  "tags": ["animated", "rain"],
+  "preview": "preview.webp",
+  "render": { "fit": "cover", "maxFps": 20 }
+}

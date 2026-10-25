@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json",
+  "manifestVersion": 1,
+  "id": "examples.aurora",
+  "name": "Aurora Ridge",
+  "version": "1.0.0",
+  "type": "shader",
+  "entry": "aurora.wgsl",
+  "author": { "name": "Wallweaver contributors" },
+  "license": "CC0-1.0",
+  "description": "Slow northern-light curtains over a dark ridge, written in WGSL.",
+  "tags": ["shader", "night", "calm"],
+  "render": { "maxFps": 24 }
+}

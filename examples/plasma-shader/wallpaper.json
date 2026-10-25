@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json",
+  "manifestVersion": 1,
+  "id": "examples.plasma",
+  "name": "Plasma",
+  "version": "1.0.0",
+  "type": "shader",
+  "entry": "plasma.frag",
+  "author": { "name": "Wallweaver contributors" },
+  "license": "CC0-1.0",
+  "description": "A slow color plasma written as a Shadertoy-style GLSL shader. Follows the pointer if you allow it.",
+  "tags": ["shader", "abstract"],
+  "render": { "maxFps": 30 },
+  "permissions": { "input.mouse": true }
+}

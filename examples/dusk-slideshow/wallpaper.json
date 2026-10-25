@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json",
+  "manifestVersion": 1,
+  "id": "examples.dusk-slideshow",
+  "name": "Dusk Hills",
+  "version": "1.0.0",
+  "type": "slideshow",
+  "entry": "dusk-1.jpg",
+  "author": { "name": "Wallweaver contributors" },
+  "license": "CC0-1.0",
+  "description": "Three dusk gradients over rolling hills, changing every ten minutes.",
+  "tags": ["slideshow", "calm"],
+  "preview": "preview.webp",
+  "slideshow": { "images": ["dusk-1.jpg", "dusk-2.jpg", "dusk-3.jpg"], "interval": 600 },
+  "render": { "fit": "cover" }
+}
