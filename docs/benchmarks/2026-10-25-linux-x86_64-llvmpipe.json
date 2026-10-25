@@ -1,0 +1,109 @@
+{
+  "version": "0.1.0-alpha.1",
+  "machine": {
+    "os": "linux",
+    "arch": "x86_64",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cores": 4,
+    "memory_mib": 16091
+  },
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits) (Vulkan, Cpu), driver llvmpipe Mesa 25.2.8-0ubuntu0.24.04.4 (LLVM 20.1.2)",
+  "software_adapter": true,
+  "resolution": "1920x1080",
+  "fps_cap": 60,
+  "results": [
+    {
+      "name": "image 4K -> screen",
+      "backend": "image",
+      "animation_mode": null,
+      "seconds": 10.067603055,
+      "frames": 0,
+      "frames_total": 1,
+      "fps": 0.0,
+      "cpu_percent": 0.12885887464104037,
+      "paused_cpu_percent": 0.0026327574167708287,
+      "paused_frames": 0,
+      "rss_before_mib": 23.12890625,
+      "rss_peak_mib": 192.125,
+      "rss_after_stop_mib": 83.6875,
+      "gpu_ms_per_frame": null,
+      "gpu_textures_mib": 7.91015625,
+      "load_seconds": 0.384400955
+    },
+    {
+      "name": "slideshow (5 s)",
+      "backend": "slideshow",
+      "animation_mode": null,
+      "seconds": 10.034625566,
+      "frames": 2,
+      "frames_total": 3,
+      "fps": 0.19930987826556634,
+      "cpu_percent": 6.550528424570018,
+      "paused_cpu_percent": 0.0025982788290839936,
+      "paused_frames": 0,
+      "rss_before_mib": 83.6875,
+      "rss_peak_mib": 238.63671875,
+      "rss_after_stop_mib": 110.40234375,
+      "gpu_ms_per_frame": 12.7644165,
+      "gpu_textures_mib": 7.91015625,
+      "load_seconds": 0.321294073
+    },
+    {
+      "name": "GIF 480x270, 25 fps",
+      "backend": "animated",
+      "animation_mode": "gpu-array",
+      "seconds": 10.060035338,
+      "frames": 250,
+      "frames_total": 265,
+      "fps": 24.8508073381879,
+      "cpu_percent": 64.1181843132806,
+      "paused_cpu_percent": 0.0023998358248313876,
+      "paused_frames": 0,
+      "rss_before_mib": 110.40234375,
+      "rss_peak_mib": 200.41796875,
+      "rss_after_stop_mib": 110.765625,
+      "gpu_ms_per_frame": 7.796122516,
+      "gpu_textures_mib": 14.83154296875,
+      "load_seconds": 0.034653463
+    },
+    {
+      "name": "shader (plasma)",
+      "backend": "shader",
+      "animation_mode": null,
+      "seconds": 10.069152482,
+      "frames": 299,
+      "frames_total": 315,
+      "fps": 29.694654096708117,
+      "cpu_percent": 99.22429934257501,
+      "paused_cpu_percent": 0.001433283237217626,
+      "paused_frames": 0,
+      "rss_before_mib": 110.765625,
+      "rss_peak_mib": 155.19921875,
+      "rss_after_stop_mib": 110.97265625,
+      "gpu_ms_per_frame": 12.576681775919731,
+      "gpu_textures_mib": 0.00006103515625,
+      "load_seconds": 0.000661449
+    }
+  ],
+  "daemon": {
+    "idle_rss_mib": 5.02734375,
+    "cases": [
+      [
+        "image 4K -> screen",
+        143.0078125
+      ],
+      [
+        "slideshow (5 s)",
+        195.484375
+      ],
+      [
+        "GIF 480x270, 25 fps",
+        226.5078125
+      ],
+      [
+        "shader (plasma)",
+        196.7890625
+      ]
+    ]
+  }
+}
