@@ -285,6 +285,7 @@ fn run(opts: GpuOptions, rx: Receiver<Command>) {
                 if slots.is_empty() {
                     // Last target gone: close the device and free driver memory.
                     gpu = None;
+                    release_heap();
                 }
             }
             Command::SetFps(id, fps) => {
@@ -335,6 +336,18 @@ fn run(opts: GpuOptions, rx: Receiver<Command>) {
     // Surfaces must go before the device.
     slots.clear();
     drop(gpu);
+}
+
+/// Hand freed heap pages back to the OS. glibc keeps freed memory in its
+/// arenas, so after closing a GPU device (which frees a lot at once) the
+/// process would otherwise keep looking as big as it was while drawing.
+fn release_heap() {
+    #[cfg(all(target_os = "linux", target_env = "gnu"))]
+    // SAFETY: malloc_trim only releases unused memory and has no
+    // preconditions.
+    unsafe {
+        libc::malloc_trim(0);
+    }
 }
 
 /// Sleep helper for callers that drive a [`Player`] themselves.

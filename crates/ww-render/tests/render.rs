@@ -547,3 +547,32 @@ fn crc32(data: &[u8]) -> u32 {
     }
     !crc
 }
+
+#[test]
+fn bundled_examples_load_and_draw() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
+    let mut seen = 0;
+    for entry in std::fs::read_dir(&root).unwrap() {
+        let dir = entry.unwrap().path();
+        let Ok(text) = std::fs::read_to_string(dir.join("wallpaper.json")) else {
+            continue;
+        };
+        let manifest = ww_manifest::Manifest::from_json(&text)
+            .unwrap_or_else(|e| panic!("{}: {e}", dir.display()));
+        let content = load_package(&manifest, &dir, &LoadOptions::for_size(320, 180))
+            .unwrap_or_else(|e| panic!("{}: {e}", dir.display()));
+        seen += 1;
+        if let Some(gpu) = gpu() {
+            let mut p = offscreen_player(&gpu, 320, 180);
+            p.set_content(&gpu, content, Duration::ZERO).unwrap();
+            assert!(p.render(&gpu, Duration::ZERO).unwrap(), "{}", dir.display());
+            let img = read(&gpu, &p);
+            assert!(
+                img.pixels().any(|px| px.0[..3] != [0, 0, 0]),
+                "{} drew nothing",
+                dir.display()
+            );
+        }
+    }
+    assert!(seen >= 4, "found {seen} examples");
+}
