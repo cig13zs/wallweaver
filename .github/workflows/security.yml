@@ -68,7 +68,9 @@ jobs:
         run: |
           set -o pipefail
           for target in unpack checksums; do
-            if ! cargo +nightly fuzz run "$target" -- -max_total_time=120 2>&1 | tee "fuzz-$target.log"; then
+            # cargo-fuzz from install-action is a musl build and would default to
+            # its own target triple; build for the runner's glibc target instead.
+            if ! cargo +nightly fuzz run --target x86_64-unknown-linux-gnu "$target" -- -max_total_time=120 2>&1 | tee "fuzz-$target.log"; then
               # Surface the end of the output as annotations so a failure is
               # readable from the run summary.
               tail -n 15 "fuzz-$target.log" | while IFS= read -r line; do echo "::error title=fuzz $target::$line"; done
