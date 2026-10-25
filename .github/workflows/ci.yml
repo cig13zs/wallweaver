@@ -70,7 +70,19 @@ jobs:
         env:
           # Linux has lavapipe installed above, so GPU tests must run there.
           WW_REQUIRE_GPU: ${{ runner.os == 'Linux' && '1' || '' }}
-        run: cargo test --workspace --locked
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! cargo test --workspace --locked --no-fail-fast 2>&1 | tee test.log; then
+            # Put the failing tests and their panic messages in the run summary.
+            grep -E "panicked at|^test .* FAILED|^---- " test.log | head -n 40 | while IFS= read -r line; do
+              echo "::error title=test failure::$line"
+            done
+            grep -A3 "panicked at" test.log | head -n 60 | while IFS= read -r line; do
+              echo "::error title=panic detail::$line"
+            done
+            exit 1
+          fi
 
       - name: Release build of ww-daemon
         shell: bash
