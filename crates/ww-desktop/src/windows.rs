@@ -56,13 +56,12 @@ use windows::Win32::UI::WindowsAndMessaging::{
     EnumWindows, FindWindowExW, FindWindowW, GWL_EXSTYLE, GWL_STYLE, GetClassNameW, GetCursorPos,
     GetForegroundWindow, GetWindowLongPtrW, GetWindowRect, GetWindowThreadProcessId, HWND_BOTTOM,
     IsZoomed, LWA_ALPHA, MSG, MsgWaitForMultipleObjects, PM_REMOVE, PeekMessageW, QS_ALLINPUT,
-    RegisterClassExW, RegisterWindowMessageW, SEND_MESSAGE_TIMEOUT_FLAGS, SMTO_NORMAL, SW_HIDE,
-    SW_SHOWNA, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SendMessageTimeoutW,
-    SetLayeredWindowAttributes, SetParent, SetWindowLongPtrW, SetWindowPos, ShowWindow,
-    TranslateMessage, WINDOW_EX_STYLE, WINDOW_STYLE, WM_DISPLAYCHANGE, WM_ERASEBKGND,
-    WM_POWERBROADCAST, WM_SETTINGCHANGE, WM_WTSSESSION_CHANGE, WNDCLASSEXW, WS_CHILD,
-    WS_CLIPCHILDREN, WS_CLIPSIBLINGS, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_NOREDIRECTIONBITMAP,
-    WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT, WS_POPUP,
+    RegisterClassExW, RegisterWindowMessageW, SMTO_NORMAL, SW_HIDE, SW_SHOWNA, SWP_NOACTIVATE,
+    SWP_NOMOVE, SWP_NOSIZE, SendMessageTimeoutW, SetLayeredWindowAttributes, SetParent,
+    SetWindowLongPtrW, SetWindowPos, ShowWindow, TranslateMessage, WINDOW_EX_STYLE, WINDOW_STYLE,
+    WM_DISPLAYCHANGE, WM_ERASEBKGND, WM_POWERBROADCAST, WM_SETTINGCHANGE, WM_WTSSESSION_CHANGE,
+    WNDCLASSEXW, WS_CHILD, WS_CLIPCHILDREN, WS_CLIPSIBLINGS, WS_EX_LAYERED, WS_EX_NOACTIVATE,
+    WS_EX_NOREDIRECTIONBITMAP, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT, WS_POPUP,
 };
 use windows::core::{BOOL, PCWSTR, PWSTR, w};
 use ww_governor::{MonitorId, MonitorSignals, Signals};
@@ -273,7 +272,7 @@ impl WindowsHost {
                     SPAWN_WORKERW,
                     WPARAM(wp),
                     LPARAM(lp),
-                    SMTO_NORMAL | SEND_MESSAGE_TIMEOUT_FLAGS(0),
+                    SMTO_NORMAL,
                     1000,
                     Some(&mut result),
                 )
