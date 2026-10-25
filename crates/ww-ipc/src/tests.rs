@@ -290,6 +290,15 @@ fn client_and_server_talk_over_a_real_socket() {
             .permissions()
             .mode();
         assert_eq!(mode & 0o777, 0o700, "socket folder must be private");
+        let sock = std::fs::metadata(dir.path().join("run/daemon.sock"))
+            .unwrap()
+            .permissions()
+            .mode();
+        assert_eq!(
+            sock & 0o077,
+            0,
+            "socket must not be open to group or others"
+        );
     }
     let handle = std::thread::spawn(move || {
         let mut conn = server.accept().unwrap();

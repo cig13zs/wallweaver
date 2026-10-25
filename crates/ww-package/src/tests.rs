@@ -626,12 +626,25 @@ fn pack_refuses_reserved_folder_and_bad_names() {
         Err(PackageError::ReservedPath(_))
     ));
 
+    // Non-ASCII names are legal on every file system but not in packages.
     let dir = sample_dir();
-    write_tree(dir.path(), &[("bad:name.txt", b"x")]);
+    write_tree(dir.path(), &[("caf\u{e9}.txt", b"x")]);
     assert!(matches!(
         pack_dir(dir.path(), Cursor::new(Vec::new())),
         Err(PackageError::BadPath { .. })
     ));
+
+    // On Windows "bad:name" would create an alternate data stream instead
+    // of a file, so this case only exists on Unix.
+    #[cfg(unix)]
+    {
+        let dir = sample_dir();
+        write_tree(dir.path(), &[("bad:name.txt", b"x")]);
+        assert!(matches!(
+            pack_dir(dir.path(), Cursor::new(Vec::new())),
+            Err(PackageError::BadPath { .. })
+        ));
+    }
 }
 
 #[cfg(unix)]

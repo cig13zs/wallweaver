@@ -185,7 +185,10 @@ impl Server {
             .name()
             .map_err(|e| IpcError::io(format!("socket name {endpoint}"), e))?;
         let opts = ListenerOptions::new().name(name).reclaim_name(true);
-        #[cfg(unix)]
+        // Setting the mode at bind time is only supported on Linux; elsewhere
+        // the private 0700 folder is what keeps other users out, and the
+        // socket file is tightened right after binding.
+        #[cfg(any(target_os = "linux", target_os = "android"))]
         let opts = {
             use interprocess::os::unix::local_socket::ListenerOptionsExt;
             opts.mode(0o600)
@@ -204,6 +207,11 @@ impl Server {
         let listener = opts
             .create_sync()
             .map_err(|e| IpcError::io(format!("listening on {endpoint}"), e))?;
+        #[cfg(unix)]
+        if let Endpoint::Path(p) = endpoint {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = std::fs::set_permissions(p, std::fs::Permissions::from_mode(0o600));
+        }
         Ok(Server {
             listener,
             endpoint: endpoint.clone(),
