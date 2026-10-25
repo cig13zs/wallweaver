@@ -448,8 +448,14 @@ fn render_loop_pauses_to_zero_and_stop_frees_the_gpu() {
     )
     .unwrap();
     lp.load(0, shader(ShaderLang::Glsl, PLASMA)).unwrap();
-    std::thread::sleep(ms(400));
-    let running = lp.stats().unwrap().slots[0].frames.frames;
+    // Slow (virtual) GPUs take a while for the first frames; wait for them
+    // instead of assuming a fixed rate.
+    let frames = |lp: &RenderLoop| lp.stats().unwrap().slots[0].frames.frames;
+    let deadline = std::time::Instant::now() + Duration::from_secs(10);
+    while frames(&lp) < 5 && std::time::Instant::now() < deadline {
+        std::thread::sleep(ms(50));
+    }
+    let running = frames(&lp);
     assert!(running >= 5, "shader should be drawing, drew {running}");
 
     lp.set_fps(0, 0);
@@ -460,8 +466,11 @@ fn render_loop_pauses_to_zero_and_stop_frees_the_gpu() {
     assert_eq!(paused_at, paused_later, "paused means no frames");
 
     lp.set_fps(0, 30);
-    std::thread::sleep(ms(300));
-    assert!(lp.stats().unwrap().slots[0].frames.frames > paused_later);
+    let deadline = std::time::Instant::now() + Duration::from_secs(10);
+    while frames(&lp) <= paused_later && std::time::Instant::now() < deadline {
+        std::thread::sleep(ms(50));
+    }
+    assert!(frames(&lp) > paused_later, "drawing resumes");
 
     lp.clear(0);
     let s = lp.stats().unwrap();
@@ -501,10 +510,20 @@ fn render_loop_draws_a_still_image_once() {
         },
     )
     .unwrap();
+    let frames = |lp: &RenderLoop| lp.stats().unwrap().slots[0].frames.frames;
+    let wait_for = |lp: &RenderLoop, n: u64| {
+        let deadline = std::time::Instant::now() + Duration::from_secs(10);
+        while frames(lp) < n && std::time::Instant::now() < deadline {
+            std::thread::sleep(ms(20));
+        }
+    };
+    wait_for(&lp, 1);
+    // Once drawn, nothing more happens.
     std::thread::sleep(ms(300));
-    assert_eq!(lp.stats().unwrap().slots[0].frames.frames, 1);
+    assert_eq!(frames(&lp), 1);
     assert_eq!(lp.snapshot(3).unwrap(), checker());
     lp.resize(3, 8, 4);
+    wait_for(&lp, 2);
     std::thread::sleep(ms(100));
     assert_eq!(
         lp.stats().unwrap().slots[0].frames.frames,
