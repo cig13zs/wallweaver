@@ -92,6 +92,7 @@ jobs:
           [ -f "$bin.exe" ] && bin="$bin.exe"
           size=$(wc -c < "$bin")
           echo "ww-daemon release binary on ${{ matrix.os }}: $size bytes" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=ww-daemon size::${{ matrix.os }}: $size bytes"
 
   ui:
     name: UI checks
