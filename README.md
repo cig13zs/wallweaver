@@ -176,7 +176,7 @@ are GPL-licensed and Wallweaver is MIT/Apache-2.0.
 Wallweaver is free and will stay free. Security and performance features are
 never paywalled.
 
-- Ko-fi: https://ko-fi.com/wallweaver (placeholder)
+- Ko-fi: https://ko-fi.com/jju1s
 - GitHub Sponsors: https://github.com/sponsors/cig13zs (placeholder)
 
 ## License
