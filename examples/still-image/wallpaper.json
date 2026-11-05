@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cig13zs/wallweaver/main/schema/wallpaper.schema.json",
+  "manifestVersion": 1,
+  "id": "examples.still-image",
+  "name": "Blue Ridges",
+  "version": "1.0.0",
+  "type": "image",
+  "entry": "ridges.jpg",
+  "author": { "name": "Wallweaver contributors" },
+  "license": "CC0-1.0",
+  "description": "A single still image of layered blue ridges. Draws one frame, then does no work at all.",
+  "tags": ["image", "calm"],
+  "preview": "preview.webp",
+  "render": { "fit": "cover" }
+}
